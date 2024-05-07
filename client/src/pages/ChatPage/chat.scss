@@ -1,0 +1,18 @@
+@import '../../styles/mixins';
+@import '../../styles/variables';
+
+.chat-page{
+    @include Container();
+
+    &__container{
+        height: 85vh;
+        width: 85vw;
+        background-color: $color-form;
+        display: grid;
+        grid-template-columns: 25% 75%;
+        
+        @media screen and (min-width: 720px) and (max-width: 1080px) {
+            grid-template-columns: 35% 65%;
+        }
+    }
+}

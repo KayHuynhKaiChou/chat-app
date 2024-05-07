@@ -1,0 +1,61 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.register-page{
+    @include Container();
+
+    &__header{
+        display: flex;
+        align-items: center;
+        margin: 10px 0;
+
+        img{
+            width: 70px;
+            height: 70px;
+        }
+
+        h1{
+            color: $text-color-form;
+            font-weight: bold;
+        }
+    }
+
+    &__form{
+        max-width: 480px;
+        background-color: $color-form;
+        border-radius: 10px;
+        padding: 10px;
+
+        label,input{
+            color: $text-color-form;
+        }
+
+        input {
+            background-color: transparent;
+        }
+
+        button{
+            font-size: 18px;
+        }
+    }
+
+    &__redirect {
+        display: flex;
+        font-size: 18px;
+        text-transform: uppercase;
+        font-weight: bold;
+
+        &--title{
+            color: $text-color-form;
+            margin-right: 7px;
+        }
+
+        &--act{
+            color: rgb(52, 52, 252);
+            cursor: pointer;
+            &:hover{
+                opacity: 0.8;
+            }
+        }
+    }
+}

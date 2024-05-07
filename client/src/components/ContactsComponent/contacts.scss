@@ -1,0 +1,86 @@
+@import '../../styles/mixins';
+
+.contacts{
+    display: grid;
+    grid-template-rows: 10% 10% 65% 15%;
+    overflow: hidden; // bỏ thuộc tính này sẽ thấy điều kì diệu và công dụng của nó
+    
+    &-title{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        img{
+            width: 40px;
+            height: 40px;
+        }
+    }
+
+    &-search{
+        background: gray;
+        border-radius: 1rem;
+        display: flex;
+        margin: 10px;
+
+        input{
+            cursor: pointer;
+        }
+    }
+
+    &-list{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        overflow: auto; 
+        gap: 0.8rem;
+        width: 100%;
+        &::-webkit-scrollbar {
+          width: 0.2rem;
+          &-thumb {
+            background-color: #ffffff39;
+            width: 0.1rem;
+            border-radius: 1rem;
+          }
+        }
+
+        &__empty{
+            margin: auto;
+            color: #aeaeae
+        }
+
+        &__item{
+            @include CardContact();
+        }
+
+        .isSelected {
+            background-color: #9a86f3;
+        }
+    }
+
+    &-personal{
+        @include CardContact();
+        width: 100%;
+        background-color: transparent;
+        justify-content: center;
+
+        h3{
+            margin: 0;
+        }
+
+        &__info{
+            margin-left: 5px;
+            display: flex;
+            flex-direction: column;
+
+            &--logout{
+                display: flex;
+                align-items: center;
+
+                svg{
+                    margin-right: 5px;
+                }
+            }
+        }
+
+        
+    }
+}

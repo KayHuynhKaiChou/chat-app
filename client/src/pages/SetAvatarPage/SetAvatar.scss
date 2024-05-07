@@ -1,0 +1,41 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.set-avatar{
+    @include Container();
+
+    .loader{
+        max-inline-size: 100%;
+    }
+
+    &__header{
+        @include Title();
+    }
+
+    &__body{
+        display: flex;
+        justify-content: space-between;
+        margin: 20px 0;
+
+        &--avatar{
+            border: 0.4rem solid transparent;
+            padding: 0.4rem;
+            border-radius: 5rem;
+            display: flex;
+            transition: 0.5s ease-in-out;
+            img{
+                cursor: pointer;
+                height: 6rem;
+                transition: 0.5s ease-in-out;
+                margin: auto;
+            }
+            &:hover{
+                border: 0.4rem solid #4e0eff;
+            }
+        }
+
+        .isSelected {
+            border: 0.4rem solid #4e0eff;
+        }
+    }
+}

@@ -1,0 +1,7 @@
+@import '../../styles/mixins';
+
+.welcome{
+    @include Container();
+    height: auto;
+    width: auto;
+}

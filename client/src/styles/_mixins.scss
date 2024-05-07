@@ -1,0 +1,35 @@
+@import 'variables';
+
+@mixin Container {
+    height: 100vh;
+    width: 100vw;
+    background-color: #131324;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+@mixin Title {
+    color: $text-color-form;
+    font-weight: bold;
+}
+
+@mixin CardContact {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    background-color: #ffffff34;
+    width: 90%;
+    cursor: pointer;
+
+    img{
+        width: 70px;
+        height: 70px;
+        margin: 7px;
+    }
+
+    h3{
+        margin-left: 5px;
+    }
+}
