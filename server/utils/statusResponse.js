@@ -27,7 +27,7 @@ export const status200 = (msg , data) => {
 
 export const status401 = () => {
     return {
-        status : 403,
+        status : 401,
         error : "unauthorized",
         message : ""
     }

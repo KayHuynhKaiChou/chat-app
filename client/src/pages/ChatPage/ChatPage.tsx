@@ -4,11 +4,11 @@ import WelcomeComponent from '../../components/WelcomeComponent/WelcomeComponent
 import './chat.scss'
 import userServices from '../../services/userServices';
 import ChatContainerComponent from '../../components/ChatContainerComponent/ChatContainerComponent';
-import { io } from "socket.io-client";
+import { Socket, io } from "socket.io-client";
 
 export default function ChatPage() {
-  const socket = useRef<any>(null);
-  const [listContacts , setListContacts] = useState([]); 
+  const socket = useRef<Socket | null>(null);
+  const [listContacts , setListContacts] = useState<User[]>([]); 
   const [currentContact , setCurrentContact] = useState<User | null>(null);
   const user = JSON.parse(localStorage.getItem('user') as string);
 
@@ -18,11 +18,10 @@ export default function ChatPage() {
 
   useEffect(() => {
     if (user) {
-      console.log(user.id);
       socket.current = io("http://localhost:1832");
       socket.current.emit("add-user", user.id);
     }
-  }, [user]);
+  }, []);
 
   return (
     <div className='chat-page'>
@@ -32,10 +31,10 @@ export default function ChatPage() {
           listContacts={listContacts}
           setCurrentContact={setCurrentContact}
         />
-        {currentContact ? (
+        {(currentContact && socket.current) ? (
           <ChatContainerComponent
             currentContact={currentContact}
-            socket={socket}
+            socket={socket.current}
           />
         ) : (
           <WelcomeComponent nameuser={user.username}/>

@@ -12,7 +12,7 @@ class messageController {
                 sender : from 
             })
             await newMsg.save();
-            res.status(200).json(status200("send message to "+to+" successfully",newMsg))
+            res.status(200).json(status200("send message to "+to+" successfully", newMsg))
         } catch (error) {
             status500(error)
         }
@@ -22,11 +22,13 @@ class messageController {
         try {
             const { from, to } = req.query;
 
-            const messages = await MessageModel.find({
-                users: {
-                $all: [from, to],
-                },
-            }).sort({ updatedAt: 1 });
+            const messages = await MessageModel
+                .find({
+                    users: {
+                        $all: [from, to],
+                    },
+                }).sort({ updatedAt: 1 })
+                .select({ createdAt: 0, deletedAt: 0 });
 
             res.status(200).json(status200(`get data messages between ${from} and ${to} successfully`,messages))
             

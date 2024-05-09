@@ -7,10 +7,11 @@ import { v4 as uuidv4 } from 'uuid';
 import messageServices from '../../services/messageServices';
 import { IconButton, Tooltip } from '@mui/material';
 import { AiOutlineDelete } from "react-icons/ai";
+import { Socket } from 'socket.io-client';
 
 interface chatContainerProps {
   currentContact : User,
-  socket : any
+  socket : Socket
 }
 
 export default function ChatContainerComponent(props : chatContainerProps) {
@@ -20,7 +21,6 @@ export default function ChatContainerComponent(props : chatContainerProps) {
   const [messages, setMessages] = useState<any>([]);
   const [isShowEmojiPicker , setIsShowEmojiPicker] = useState(false);
   const [msgInput , setMsgInput] = useState('');
-  const [arrivalMessage, setArrivalMessage] = useState<any>({});
   const scrollRef = useRef<any>();
   const textArea = useRef<any>();
   const [percentRowGridFooter , setPercentRowGridFooter] = useState(10);
@@ -28,29 +28,22 @@ export default function ChatContainerComponent(props : chatContainerProps) {
   const fetchGetMessages = async () => {
     messageServices.getMessageService({
       from : user.id,
-      to : currentContact.id as string,
-    }).then(res => setMessages(res.data))
+      to : currentContact.id,
+    }).then(res => {
+      setMessages(res.data)
+    })
   }
-
-  useEffect(() => {
-    currentContact && fetchGetMessages()
-  },[currentContact])
 
   const handleSendMessage = async () => {
     const msgSend = {
       from : user.id,
-      to : currentContact.id as string,
+      to : currentContact.id,
       message : msgInput
     }
-    socket.current.emit("send-msg", msgSend);
-    const res = await messageServices.sendMessageService(msgSend);
+    await messageServices.sendMessageService(msgSend);
     setMsgInput('');
     await fetchGetMessages();
-    // setMessages([...messages , {
-    //   users : [user.id , currentContact.id],
-    //   sender : user.id,
-    //   message : msgInput
-    // }])
+    socket.emit("send-msg", msgSend);
   }
 
   const handleEmojiClick = (emojiObject : any) => {
@@ -75,26 +68,19 @@ export default function ChatContainerComponent(props : chatContainerProps) {
   }
 
   useEffect(() => {
-    if (socket.current) {
-      socket.current.on("msg-recieve", (message : any) => {
-        console.log({ message })
-        setArrivalMessage({
-          message,
-          from : currentContact.id,
-          to : user.id
-        });
-      });
-    }
+    currentContact && fetchGetMessages()
+  },[currentContact])
+
+  useEffect(() => {
+    socket.on("receive-msg", async () => {
+      await fetchGetMessages();
+    });
 
     return () => {
       // Clean up the event listener when the component unmounts
-      socket.current.off("msg-recieve");
+      socket.off("receive-msg");
     };
   }, []);
-
-  useEffect(() => {
-    arrivalMessage && setMessages((prev : any) => [...prev, arrivalMessage]);
-  }, [arrivalMessage]);
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });

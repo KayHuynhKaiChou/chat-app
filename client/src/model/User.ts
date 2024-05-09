@@ -1,8 +1,11 @@
-interface User {
-    id ?: string,
-    username : string,
+interface Account {
     email ?: string,
+    username : string,
     password ?: string,
     confirmPassword ?: string,
+}
+
+interface User extends Account{
+    id : string,
     avatarImage ?: string
 }

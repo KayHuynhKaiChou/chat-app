@@ -11,7 +11,7 @@ export default function LoginPage() {
 
     const navigate = useNavigate();
 
-    const handleSignIn = (values : User) => {
+    const handleSignIn = (values : Account) => {
         userServices.signInService(values)
             .then(res => {
                 toast.success(res.message , toastMSGObject());

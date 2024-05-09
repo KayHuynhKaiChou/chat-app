@@ -27,19 +27,24 @@ const io = new Server(server, {
 
 global.onlineUsers = new Map();
 io.on("connection", (socket) => {
-  global.chatSocket = socket;
+  // global.chatSocket = socket;
   socket.on("add-user", (userId) => {
     onlineUsers.set(userId, socket.id);
   });
-
-  console.log(global.onlineUsers)
+  //console.log(global.onlineUsers)
 
   socket.on("send-msg", (data) => {
-    console.log({ data })
+    //console.log({ data })
     const sendUserSocket = onlineUsers.get(data.to);
-    console.log(sendUserSocket , data.to)
+    // console.log({
+    //   onlineUsers : global.onlineUsers
+    // })
+    // console.log({
+    //   idReceiver : data.to,
+    //   idSockerReceiver : sendUserSocket
+    // })
     if (sendUserSocket) {
-      socket.to(sendUserSocket).emit("msg-recieve", data.message);
+      socket.to(sendUserSocket).emit("receive-msg");
     }
   });
 });

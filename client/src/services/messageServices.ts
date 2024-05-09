@@ -2,12 +2,12 @@ import axios from "axios"
 const API_URL = import.meta.env.VITE_API_URL
 
 class messageServices {
-    sendMessageService = async (data : Message) => {
+    sendMessageService = async (data : Omit<MessagePayload , 'message'>) => {
         const res = await axios.post(`${API_URL}/message/send-messages` , data);
         return res.data
     }
 
-    getMessageService = async ({from , to} : Message) => {
+    getMessageService = async ({from , to} : Omit<MessagePayload , 'message'>) => {
         const res = await axios.get(`${API_URL}/message/get-messages?from=${from}&to=${to}`);
         return res.data
     }

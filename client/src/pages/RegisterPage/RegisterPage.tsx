@@ -11,7 +11,7 @@ export default function RegisterPage() {
 
     const navigate = useNavigate();
 
-    const handleSignUp = (values : User) => {
+    const handleSignUp = (values : Account) => {
         userServices.signUpService(values)
             .then(res => {
                 toast.success(res.message , toastMSGObject())

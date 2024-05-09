@@ -2,22 +2,22 @@ import axios from "axios"
 const API_URL = import.meta.env.VITE_API_URL
 
 class userServices {
-    signInService = async (data : User) => {
+    signInService = async (data : Account) => {
         const res = await axios.post(`${API_URL}/user/sign-in` , data);
         return res.data
     }
 
-    signUpService = async (data : User) => {
+    signUpService = async (data : Account) => {
         const res = await axios.post(`${API_URL}/user/sign-up` , data);
         return res.data
     }
 
-    setAvatarService = async (data : any , idUser : string) => {
+    setAvatarService = async (data : any , idUser : User['id']) => {
         const res = await axios.put(`${API_URL}/user/set-avatar/${idUser}` , data);
         return res.data
     }
 
-    getAllUsersService = async (idUser : string) => {
+    getAllUsersService = async (idUser : User['id']) => {
         const res = await axios.get(`${API_URL}/user/all-users/${idUser}`);
         return res.data
     }
