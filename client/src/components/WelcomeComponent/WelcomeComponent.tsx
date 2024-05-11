@@ -1,3 +1,4 @@
+// @ts-ignore
 import robot from '../../assets/robot.gif'
 import './welcome.scss'
 

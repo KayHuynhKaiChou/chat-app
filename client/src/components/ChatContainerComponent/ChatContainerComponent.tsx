@@ -1,13 +1,13 @@
 import './chatContainer.scss'
 import { BsEmojiSmileFill } from "react-icons/bs";
 import { IoMdSend } from "react-icons/io";
-import Picker, { EmojiClickData } from "emoji-picker-react";
+import Picker from "emoji-picker-react";
 import { useState , useEffect , useRef, KeyboardEvent} from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import messageServices from '../../services/messageServices';
 import { IconButton, Tooltip } from '@mui/material';
 import { AiOutlineDelete } from "react-icons/ai";
 import { Socket } from 'socket.io-client';
+import useMessageAction from '../../hooks/useMessageAction';
 
 interface chatContainerProps {
   currentContact : User,
@@ -18,39 +18,20 @@ export default function ChatContainerComponent(props : chatContainerProps) {
 
   const {currentContact , socket} = props;
   const user = JSON.parse(localStorage.getItem('user') as string);
-  const [messages, setMessages] = useState<MessageData[]>([]);
   const [isShowEmojiPicker , setIsShowEmojiPicker] = useState(false);
-  const [msgInput , setMsgInput] = useState('');
+  const [percentRowGridFooter , setPercentRowGridFooter] = useState(10);
   const scrollRef = useRef<any>();
   const textArea = useRef<any>();
-  const [percentRowGridFooter , setPercentRowGridFooter] = useState(10);
+  const {
+    msgInput,
+    messages,
+    handleSendMessage,
+    handleDeleteMsg,
+    handleSelectEmoji,
+    handleChangeTextMessage
+  } = useMessageAction(socket , user , currentContact)
 
-  const msgSend = {
-    from : user.id,
-    to : currentContact.id,
-    message : msgInput
-  }
-
-  const fetchGetMessages = async () => {
-    messageServices.getMessageService({
-      from : user.id,
-      to : currentContact.id,
-    }).then(res => {
-      setMessages(res.data)
-    })
-  }
-
-  const handleSendMessage = async () => {
-    await messageServices.sendMessageService(msgSend);
-    setMsgInput('');
-    await fetchGetMessages();
-    socket.emit("send-msg", msgSend.to);
-  }
-
-  const handleEmojiClick = (emojiObject : EmojiClickData) => {
-    setMsgInput((prevMsgInput) => prevMsgInput + emojiObject.emoji);
-  };
-
+  // function handler
   const handleEnterPress = (event : KeyboardEvent<HTMLTextAreaElement>) => {
     textArea.current.style.height = 'auto';
     const textAreaElementHtml = event.target as HTMLTextAreaElement
@@ -62,12 +43,6 @@ export default function ChatContainerComponent(props : chatContainerProps) {
     }else{
       textArea.current.style.overflowY = 'auto'
     }
-  }
-
-  const handleDeleteMsg = async (idMsg : string) => {
-    await messageServices.deleteMessageService(idMsg);
-    await fetchGetMessages();
-    socket.emit("send-msg", msgSend.to);
   }
 
   const handleClickOutsidePicker = (event : MouseEvent) => {
@@ -96,21 +71,7 @@ export default function ChatContainerComponent(props : chatContainerProps) {
     }
   } 
 
-  useEffect(() => {
-    currentContact && fetchGetMessages()
-  },[currentContact])
-
-  useEffect(() => {
-    socket.on("receive-msg", async () => {
-      await fetchGetMessages();
-    });
-
-    return () => {
-      // Clean up the event listener when the component unmounts
-      socket.off("receive-msg");
-    };
-  }, []);
-
+  // hook useEffect
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -159,15 +120,20 @@ export default function ChatContainerComponent(props : chatContainerProps) {
       </div>
       <div className="chat-footer">
         <div className="chat-footer__emoji">
-          <BsEmojiSmileFill onClick={() => setIsShowEmojiPicker(!isShowEmojiPicker)}/>
-          <Picker open={isShowEmojiPicker} onEmojiClick={handleEmojiClick}/>
+          <BsEmojiSmileFill 
+            onClick={() => setIsShowEmojiPicker(!isShowEmojiPicker)}
+          />
+          <Picker 
+            open={isShowEmojiPicker} 
+            onEmojiClick={handleSelectEmoji}
+          />
         </div>
         <div className="chat-footer__act">
           <textarea
             rows={1}
             ref={textArea}
             placeholder="type your message here"
-            onChange={(e) => setMsgInput(e.target.value)}
+            onChange={handleChangeTextMessage}
             onKeyUp={handleEnterPress}
             value={msgInput}
           />
