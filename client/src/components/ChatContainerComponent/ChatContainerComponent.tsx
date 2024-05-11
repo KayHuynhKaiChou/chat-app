@@ -18,12 +18,18 @@ export default function ChatContainerComponent(props : chatContainerProps) {
 
   const {currentContact , socket} = props;
   const user = JSON.parse(localStorage.getItem('user') as string);
-  const [messages, setMessages] = useState<any>([]);
+  const [messages, setMessages] = useState<MessageData[]>([]);
   const [isShowEmojiPicker , setIsShowEmojiPicker] = useState(false);
   const [msgInput , setMsgInput] = useState('');
   const scrollRef = useRef<any>();
   const textArea = useRef<any>();
   const [percentRowGridFooter , setPercentRowGridFooter] = useState(10);
+
+  const msgSend = {
+    from : user.id,
+    to : currentContact.id,
+    message : msgInput
+  }
 
   const fetchGetMessages = async () => {
     messageServices.getMessageService({
@@ -35,15 +41,10 @@ export default function ChatContainerComponent(props : chatContainerProps) {
   }
 
   const handleSendMessage = async () => {
-    const msgSend = {
-      from : user.id,
-      to : currentContact.id,
-      message : msgInput
-    }
     await messageServices.sendMessageService(msgSend);
     setMsgInput('');
     await fetchGetMessages();
-    socket.emit("send-msg", msgSend);
+    socket.emit("send-msg", msgSend.to);
   }
 
   const handleEmojiClick = (emojiObject : any) => {
@@ -63,9 +64,30 @@ export default function ChatContainerComponent(props : chatContainerProps) {
     }
   }
 
-  const handleDeleteMsg = (idMsg : string) => {
-    messageServices.deleteMessageService(idMsg)
+  const handleDeleteMsg = async (idMsg : string) => {
+    await messageServices.deleteMessageService(idMsg);
+    await fetchGetMessages();
+    socket.emit("send-msg", msgSend.to);
   }
+
+  const showFinalMessage = (msgData : MessageData , isOneSelf : boolean) => {
+    if(msgData.isDeleted){
+      const subject = isOneSelf ? 'You' : currentContact.username
+      return subject + ' has deleted this message.'
+    }else{
+      return msgData.message
+    }
+  }
+
+  const finalClassNameMessage = (isMsgDeleted : boolean , isOneSelf : boolean) => {
+    let classNameOrigin = `chat-body__message`;
+    let classNameFinal = `${classNameOrigin} ${classNameOrigin}__${isOneSelf ? 'sended' : 'received'}`
+    if(isMsgDeleted){
+      return classNameFinal.concat(` ${classNameOrigin}__deleted`)
+    }else{
+      return classNameFinal
+    }
+  } 
 
   useEffect(() => {
     currentContact && fetchGetMessages()
@@ -98,15 +120,15 @@ export default function ChatContainerComponent(props : chatContainerProps) {
       <div className="chat-body">
         {messages.length===0 ? (
           <div className='chat-body__empty'>Hiện ko có tin nhắn trong cuộc trò truyện này</div>
-        ) : messages.map((msg : any) => {
+        ) : messages.map(msg => {
           const isOneSelf = msg.sender === user.id;
           return (
             <div 
               key={uuidv4()}
               ref={scrollRef}
-              className={`chat-body__message ${isOneSelf ? 'sended' : 'received'}`}
+              className={finalClassNameMessage(msg.isDeleted , isOneSelf)}
             >
-              {isOneSelf && (
+              {(isOneSelf && !msg.isDeleted) && (
                 <Tooltip title="Delete this message">
                   <IconButton onClick={() => handleDeleteMsg(msg._id)}>
                     <AiOutlineDelete />
@@ -116,7 +138,7 @@ export default function ChatContainerComponent(props : chatContainerProps) {
               {!isOneSelf && (
                 <img src={`data:image/svg+xml;base64,${currentContact.avatarImage}`} alt="" />
               )}
-              <h3>{msg.message}</h3>
+              <h3>{showFinalMessage(msg , isOneSelf)}</h3>
             </div>
           )         
         })}

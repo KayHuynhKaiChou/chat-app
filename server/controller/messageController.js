@@ -27,7 +27,7 @@ class messageController {
                     users: {
                         $all: [from, to],
                     },
-                }).sort({ updatedAt: 1 })
+                }).sort({ createdAt: 1 })
                 .select({ createdAt: 0, deletedAt: 0 });
 
             res.status(200).json(status200(`get data messages between ${from} and ${to} successfully`,messages))

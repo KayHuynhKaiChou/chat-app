@@ -33,9 +33,9 @@ io.on("connection", (socket) => {
   });
   //console.log(global.onlineUsers)
 
-  socket.on("send-msg", (data) => {
+  socket.on("send-msg", (idReceiver) => {
     //console.log({ data })
-    const sendUserSocket = onlineUsers.get(data.to);
+    const sendUserSocket = onlineUsers.get(idReceiver);
     // console.log({
     //   onlineUsers : global.onlineUsers
     // })

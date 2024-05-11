@@ -42,11 +42,12 @@
             background-color: transparent;
             display: flex;
             align-items: flex-end;
+            width: 100%;
             h3{
                 height: 100%;
                 border-radius: 1rem;
                 padding: 10px;
-                max-width: 300px;
+                max-width: 70%;
                 text-align: left;
                 white-space: pre-wrap; //Duy trì khoảng trắng và xuống dòng tự động khi cần thiết.
             }
@@ -57,27 +58,35 @@
                     font-size: 18px;
                 }
             }
-        }
 
-        .received{
-            align-self: flex-start;
-            h3{
-                background: #4E4F50;
+            &.chat-body__message__received{
+                justify-content: flex-start;
+                h3{
+                    background: #4E4F50;
+                }
+                img{
+                    width: 40px;
+                    height: 40px;
+                    margin-right: 10px;
+                }
+                button{
+                    order: 3;
+                }
             }
-            img{
-                width: 40px;
-                height: 40px;
-                margin-right: 10px;
-            }
-            button{
-                order: 3;
-            }
-        }
 
-        .sended{
-            align-self: flex-end;
-            h3{
-                background: #77A7FF;
+            &.chat-body__message__sended{
+                justify-content: flex-end;
+                h3{
+                    background: #77A7FF;
+                }
+            }
+
+            &.chat-body__message__deleted{
+                h3{
+                    font-style: italic;
+                    background: transparent;
+                    border: 1px solid;
+                }
             }
         }
     }
