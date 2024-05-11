@@ -1,8 +1,8 @@
 import './chatContainer.scss'
 import { BsEmojiSmileFill } from "react-icons/bs";
 import { IoMdSend } from "react-icons/io";
-import Picker from "emoji-picker-react";
-import { useState , useEffect , useRef} from 'react';
+import Picker, { EmojiClickData } from "emoji-picker-react";
+import { useState , useEffect , useRef, KeyboardEvent} from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import messageServices from '../../services/messageServices';
 import { IconButton, Tooltip } from '@mui/material';
@@ -47,14 +47,14 @@ export default function ChatContainerComponent(props : chatContainerProps) {
     socket.emit("send-msg", msgSend.to);
   }
 
-  const handleEmojiClick = (emojiObject : any) => {
-    console.log(emojiObject)
+  const handleEmojiClick = (emojiObject : EmojiClickData) => {
     setMsgInput((prevMsgInput) => prevMsgInput + emojiObject.emoji);
   };
 
-  const handleEnterPress = (event : any) => {
+  const handleEnterPress = (event : KeyboardEvent<HTMLTextAreaElement>) => {
     textArea.current.style.height = 'auto';
-    let scHeight = event.target.scrollHeight;
+    const textAreaElementHtml = event.target as HTMLTextAreaElement
+    let scHeight = textAreaElementHtml.scrollHeight;
     textArea.current.style.height = `${scHeight}px`;
     if(scHeight <= 230){
       textArea.current.style.overflowY = 'hidden'
@@ -68,6 +68,13 @@ export default function ChatContainerComponent(props : chatContainerProps) {
     await messageServices.deleteMessageService(idMsg);
     await fetchGetMessages();
     socket.emit("send-msg", msgSend.to);
+  }
+
+  const handleClickOutsidePicker = (event : MouseEvent) => {
+    const elementHtml = event.target as HTMLElement 
+    if(!elementHtml.closest('.EmojiPickerReact') && !elementHtml.closest('.chat-footer__emoji svg')){
+      setIsShowEmojiPicker(false)
+    }
   }
 
   const showFinalMessage = (msgData : MessageData , isOneSelf : boolean) => {
@@ -108,6 +115,13 @@ export default function ChatContainerComponent(props : chatContainerProps) {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  useEffect(() => {
+    document.addEventListener('click', handleClickOutsidePicker)
+    return () => {
+      document.removeEventListener('click', handleClickOutsidePicker)
+    }
+  }, [])
+
   return (
     <div
       className="chat" 
@@ -146,7 +160,7 @@ export default function ChatContainerComponent(props : chatContainerProps) {
       <div className="chat-footer">
         <div className="chat-footer__emoji">
           <BsEmojiSmileFill onClick={() => setIsShowEmojiPicker(!isShowEmojiPicker)}/>
-          {isShowEmojiPicker && <Picker onEmojiClick={handleEmojiClick}/>}
+          <Picker open={isShowEmojiPicker} onEmojiClick={handleEmojiClick}/>
         </div>
         <div className="chat-footer__act">
           <textarea

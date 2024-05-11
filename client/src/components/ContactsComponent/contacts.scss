@@ -57,7 +57,8 @@
     }
 
     &-personal{
-        @include CardContact();
+        @include CardContact;
+        cursor: default;
         width: 100%;
         background-color: transparent;
         justify-content: center;
@@ -70,8 +71,9 @@
             margin-left: 5px;
             display: flex;
             flex-direction: column;
-
+            
             &--logout{
+                cursor: pointer;
                 display: flex;
                 align-items: center;
 
