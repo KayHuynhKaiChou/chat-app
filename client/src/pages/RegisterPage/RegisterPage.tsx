@@ -1,4 +1,5 @@
 import { CssBaseline } from "@mui/material";
+// @ts-ignore
 import logoChat from '../../assets/logoChat.svg'
 import './register.scss'
 import FormSignUpComponent from "../../components/FormComponent/FormSignUpComponent";

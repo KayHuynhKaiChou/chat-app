@@ -1,8 +1,9 @@
 import { Button } from '@mui/material';
 import { patternAvatars, toastMSGObject } from '../../utils/availableMethod';
-import './SetAvatar.scss'
-import {useState , useEffect} from 'react'
-import loader from '../../assets/loader.gif'
+import './setAvatar.scss'
+import {useState , useEffect} from 'react';
+// @ts-ignore
+import loader from '../../assets/loader.gif';
 import userServices from '../../services/userServices';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';

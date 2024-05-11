@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+// @ts-ignore
 import logoChat from '../../assets/logoChat.svg'
 import {useEffect, useState} from 'react'
 import './contacts.scss'
