@@ -1,5 +1,6 @@
 import { MessageModel } from "../model/MessageModel.js";
 import { status200, status400, status500 } from "../utils/statusResponse.js"
+import baseService from "./baseService.js";
 
 class messageController {
 
@@ -22,15 +23,12 @@ class messageController {
         try {
             const { from, to } = req.query;
 
-            const messages = await MessageModel
-                .find({
-                    users: {
-                        $all: [from, to],
-                    },
-                }).sort({ createdAt: 1 })
-                .select({ createdAt: 0, deletedAt: 0 });
+            const messagesResult = await baseService.showConversationBetween(from , to)
 
-            res.status(200).json(status200(`get data messages between ${from} and ${to} successfully`,messages))
+            res.status(200).json(status200(
+                `get data messages between ${from} and ${to} successfully`,
+                messagesResult
+            ))
             
         } catch (error) {
             status500(error)

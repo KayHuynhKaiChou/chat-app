@@ -32,7 +32,7 @@
         align-items: center;
         overflow: auto; 
         gap: 0.8rem;
-        width: 100%;
+        padding: 10px;
         &::-webkit-scrollbar {
           width: 0.2rem;
           &-thumb {
@@ -48,7 +48,31 @@
         }
 
         &__item{
-            @include CardContact();
+            width: 100%;
+            .item-detail-wrap{
+                @include CardContact();
+                .item-detailAvatar{
+                    display: flex;
+                    padding: 10px;
+                }
+
+                .item-detailInfo{
+                    display: flex;
+                    flex-direction: column;
+                    width: calc(100% - 90px);
+                    &__name{
+                        font-size: 18px;
+                        font-weight: bold;
+                        text-transform: capitalize;
+                    }
+
+                    &__msg{
+                        white-space: nowrap; /* Ngăn chặn việc ngắt dòng */
+                        overflow: hidden; /* Ẩn phần nội dung vượt quá */
+                        text-overflow: ellipsis;
+                    }
+                }
+            }
         }
 
         .isSelected {

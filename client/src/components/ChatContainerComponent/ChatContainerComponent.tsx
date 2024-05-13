@@ -10,13 +10,13 @@ import { Socket } from 'socket.io-client';
 import useMessageAction from '../../hooks/useMessageAction';
 
 interface chatContainerProps {
-  currentContact : User,
+  receiver : User,
   socket : Socket
 }
 
 export default function ChatContainerComponent(props : chatContainerProps) {
 
-  const {currentContact , socket} = props;
+  const {receiver , socket} = props;
   const user = JSON.parse(localStorage.getItem('user') as string);
   const [isShowEmojiPicker , setIsShowEmojiPicker] = useState(false);
   const [percentRowGridFooter , setPercentRowGridFooter] = useState(10);
@@ -29,7 +29,7 @@ export default function ChatContainerComponent(props : chatContainerProps) {
     handleDeleteMsg,
     handleSelectEmoji,
     handleChangeTextMessage
-  } = useMessageAction(socket , user , currentContact)
+  } = useMessageAction(socket , user , receiver)
 
   // function handler
   const handleEnterPress = (event : KeyboardEvent<HTMLTextAreaElement>) => {
@@ -54,7 +54,7 @@ export default function ChatContainerComponent(props : chatContainerProps) {
 
   const showFinalMessage = (msgData : MessageData , isOneSelf : boolean) => {
     if(msgData.isDeleted){
-      const subject = isOneSelf ? 'You' : currentContact.username
+      const subject = isOneSelf ? 'You' : receiver.username
       return subject + ' has deleted this message.'
     }else{
       return msgData.message
@@ -89,8 +89,8 @@ export default function ChatContainerComponent(props : chatContainerProps) {
       style={{gridTemplateRows:`10% ${100-10-percentRowGridFooter}% ${percentRowGridFooter}%`}}
     >
       <div className="chat-header">
-        <img src={`data:image/svg+xml;base64,${currentContact.avatarImage}`} alt="avatar" />
-        <h3>{currentContact.username}</h3>
+        <img src={`data:image/svg+xml;base64,${receiver.avatarImage}`} alt="avatar" />
+        <h3>{receiver.username}</h3>
       </div>
       <div className="chat-body">
         {messages.length===0 ? (
@@ -111,7 +111,7 @@ export default function ChatContainerComponent(props : chatContainerProps) {
                 </Tooltip>
               )}
               {!isOneSelf && (
-                <img src={`data:image/svg+xml;base64,${currentContact.avatarImage}`} alt="" />
+                <img src={`data:image/svg+xml;base64,${receiver.avatarImage}`} alt="" />
               )}
               <h3>{showFinalMessage(msg , isOneSelf)}</h3>
             </div>

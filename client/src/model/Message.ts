@@ -5,12 +5,13 @@ interface MessagePayload {
 }
 
 interface MessageData {
-    _id : string,
+    _id : string;
     users : [
         MessagePayload['from'],
         MessagePayload['to']
     ],
-    sender : MessagePayload['from'],
-    message : MessagePayload['message']
-    isDeleted : boolean
+    sender : MessagePayload['from'];
+    viewers : Array<User['id']>
+    message : MessagePayload['message'];
+    isDeleted : boolean;
 }

@@ -1,6 +1,7 @@
 import { UserModel } from "../model/UserModel.js";
 import { status200, status400, status500 } from "../utils/statusResponse.js"
 import bcrypt from 'bcrypt'
+import baseService from "./baseService.js";
 
 class userController {
 
@@ -46,7 +47,6 @@ class userController {
                 password : hashPass
             })
             await newAccount.save();
-            console.log(newAccount)
             res.status(200).json(status200("Register successfully" , {
                 id : newAccount._id,
                 username,
@@ -74,16 +74,30 @@ class userController {
 
     getAllUsers = async (req,res) => {
         try {
-            const listUsers = await UserModel.find({ _id: { $ne: req.params.id } }).select([
+            const idSender = req.params.id;
+            const listUsers = await UserModel.find({ _id: { $ne: idSender } }).select([
                 "email",
                 "username",
                 "avatarImage",
                 "_id",
             ]).lean();
-            const modifiedListUsers = listUsers.map(user => {
-                return { ...user, id: user._id };
+
+            const modifiedListUsersPromise = listUsers.map(async (user) => {
+                const messagesResult = await baseService.showConversationBetween(idSender , user._id.toString())
+                const receiver = {
+                    id: user._id,
+                    username: user.username,
+                    email : user.email,
+                    avatarImage : user.avatarImage 
+                };
+                const newMessage = [...messagesResult].pop() 
+                return {
+                    receiver,
+                    newMessage
+                }
             });
-            res.status(200).json(status200("Get all users success",modifiedListUsers));
+            const modifiedListUsers = await Promise.all(modifiedListUsersPromise)
+            res.status(200).json(status200("Get all users success", modifiedListUsers));
         } catch (error) {
             status500(error)
         }
