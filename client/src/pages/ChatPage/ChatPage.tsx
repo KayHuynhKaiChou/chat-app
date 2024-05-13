@@ -8,9 +8,13 @@ import { Socket, io } from "socket.io-client";
 
 export default function ChatPage() {
   const socket = useRef<Socket | null>(null);
-  const [listContacts , setListContacts] = useState<User[]>([]); 
-  const [currentContact , setCurrentContact] = useState<User | null>(null);
+  const [listContacts , setListContacts] = useState<Contact[]>([]); 
+  const [currentContact , setCurrentContact] = useState<Contact | null>(null);
   const user = JSON.parse(localStorage.getItem('user') as string);
+
+  const handleChangeCurrentContact = (contact : Contact) => {
+    setCurrentContact(contact);
+  }
 
   useEffect(() => {
     userServices.getAllUsersService(user.id).then(res => setListContacts(res.data))
@@ -29,11 +33,11 @@ export default function ChatPage() {
         <ContactsComponent 
           user={user} 
           listContacts={listContacts}
-          setCurrentContact={setCurrentContact}
+          onChangeCurrentContact={handleChangeCurrentContact}
         />
         {(currentContact && socket.current) ? (
           <ChatContainerComponent
-            currentContact={currentContact}
+            receiver={currentContact.receiver}
             socket={socket.current}
           />
         ) : (

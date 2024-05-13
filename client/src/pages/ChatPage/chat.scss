@@ -5,11 +5,11 @@
     @include Container();
 
     &__container{
-        height: 85vh;
-        width: 85vw;
+        height: 90vh;
+        width: 90vw;
         background-color: $color-form;
         display: grid;
-        grid-template-columns: 25% 75%;
+        grid-template-columns: 30% 70%;
         
         @media screen and (min-width: 720px) and (max-width: 1080px) {
             grid-template-columns: 35% 65%;
