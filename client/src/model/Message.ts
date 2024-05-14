@@ -14,4 +14,5 @@ interface MessageData {
     viewers : Array<User['id']>
     message : MessagePayload['message'];
     isDeleted : boolean;
+    createdAt: string;
 }
