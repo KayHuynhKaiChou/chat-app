@@ -49,7 +49,8 @@
                 padding: 10px;
                 max-width: 70%;
                 text-align: left;
-                white-space: pre-wrap; //Duy trì khoảng trắng và xuống dòng tự động khi cần thiết.
+                word-break: break-word; // Text vượt quá chiều dài container sẽ xuống dòng
+                white-space: pre-wrap; // Duy trì khoảng trắng và xuống dòng tự động khi cần thiết.
             }
             button{
                 margin : 10px 0;
@@ -92,85 +93,89 @@
     }
 
     &-footer{
-        display: flex;
-        align-items: end;
-        &__emoji{
-            padding: 0 10px;
+
+        &-inner{
+            padding-top: 20px;
             display: flex;
-            svg {
-                font-size: 1.5rem;
-                color: #ffff00c8;
-                cursor: pointer;
-            }
-
-            .EmojiPickerReact {
-                position: absolute !important;
-                top: 150px;
-                background-color: #080420;
-                box-shadow: 0 5px 10px $color-select;
-                border-color: $color-select !important;
-
-                .emoji-scroll-wrapper::-webkit-scrollbar {
-                  background-color: #080420;
-                  width: 5px;
-                  &-thumb {
-                    background-color: $color-select;
-                  }
-                }
-            }
-        }
-
-        &__act{
-            flex: 1;
-            display: flex;
-            textarea{
-                //height: 35px;
-                max-height: 230px;
-                resize: none;
-                overflow-y: hidden;
-                background-color: #ffffff34;
-                width: 93%;
-                border-radius: 1rem;
-                font-size: 18px;
-                padding: 5px 15px;
-                border: none;
-                color: #ffff;
-                white-space: pre-wrap;
-
-                &::selection {
-                    background-color: #9a86f3;
-                }
-                &:focus {
-                    outline: none;
-                }
-            }
-
-            .btn-send{
+            align-items: end;
+            &__emoji{
+                padding: 0 10px;
                 display: flex;
-                align-items: end;
-
-                button{
-                    height: 33px;
-                    margin-left: 10px;
-                    width: 3.5rem;
-                    display: flex;
-                    border: none;
-                    border-radius: 50px;
-                    background: $color-select;
+                svg {
+                    font-size: 1.5rem;
+                    color: #ffff00c8;
                     cursor: pointer;
-                    
-                    svg{
-                        font-size: 22px;
-                        margin: auto;
-                        color: #ffff;
-                    }
+                }
     
-                    &:hover{
-                        opacity: 0.8;
+                .EmojiPickerReact {
+                    position: absolute !important;
+                    top: 150px;
+                    background-color: #080420;
+                    box-shadow: 0 5px 10px $color-select-contact;
+                    border-color: $color-select-contact !important;
+    
+                    .emoji-scroll-wrapper::-webkit-scrollbar {
+                      background-color: #080420;
+                      width: 5px;
+                      &-thumb {
+                        background-color: $color-select-contact;
+                      }
                     }
                 }
             }
-
+    
+            &__act{
+                flex: 1;
+                display: flex;
+                textarea{
+                    //height: 35px;
+                    max-height: 230px;
+                    resize: none;
+                    overflow-y: hidden;
+                    background-color: #ffffff34;
+                    width: 93%;
+                    border-radius: 1rem;
+                    font-size: 18px;
+                    padding: 5px 15px;
+                    border: none;
+                    color: #ffff;
+                    white-space: pre-wrap;
+    
+                    &::selection {
+                        background-color: #9a86f3;
+                    }
+                    &:focus {
+                        outline: none;
+                    }
+                }
+    
+                .btn-send{
+                    display: flex;
+                    align-items: end;
+    
+                    button{
+                        height: 33px;
+                        margin-left: 10px;
+                        width: 3.5rem;
+                        display: flex;
+                        border: none;
+                        border-radius: 50px;
+                        background: $color-select-contact;
+                        cursor: pointer;
+                        
+                        svg{
+                            font-size: 22px;
+                            margin: auto;
+                            color: #ffff;
+                        }
+        
+                        &:hover{
+                            opacity: 0.8;
+                        }
+                    }
+                }
+    
+            }
         }
     }
 }

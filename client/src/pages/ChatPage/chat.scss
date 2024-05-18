@@ -5,8 +5,8 @@
     @include Container();
 
     &__container{
-        height: 90vh;
-        width: 90vw;
+        height: $height-chat-page-container;
+        width: $width-chat-page-container;
         background-color: $color-form;
         display: grid;
         grid-template-columns: 30% 70%;

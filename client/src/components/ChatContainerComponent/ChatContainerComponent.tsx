@@ -2,7 +2,7 @@ import "./chatContainer.scss";
 import { BsEmojiSmileFill } from "react-icons/bs";
 import { IoMdSend } from "react-icons/io";
 import Picker from "emoji-picker-react";
-import { useState, useEffect, useRef, KeyboardEvent } from "react";
+import { useState, useEffect, useRef} from "react";
 import { v4 as uuidv4 } from "uuid";
 import { IconButton, Tooltip } from "@mui/material";
 import { AiOutlineDelete } from "react-icons/ai";
@@ -18,6 +18,15 @@ interface chatContainerProps {
   updateCurrentContact: (newMessage : MessageData) => void
 }
 
+const DEFAULT_PERCENT_ROW_CHAT_HEADER = 10 as const
+
+// .chat-footer-inner is padding in .chat-footer
+const PADDING_TOP_CHAT_FOOTER = 20 as const
+
+const DEFAULT_HEIGHT_CHAT_CONTAINER = 650 as const
+
+const MAX_WIDTH_CHAT_FOOTER = 230 as const
+
 export default function ChatContainerComponent(props: chatContainerProps) {
   const { 
     receiver,
@@ -29,9 +38,8 @@ export default function ChatContainerComponent(props: chatContainerProps) {
   } = props;
   const user = JSON.parse(localStorage.getItem("user") as string);
   const [isShowEmojiPicker, setIsShowEmojiPicker] = useState(false);
-  const [percentRowGridFooter, setPercentRowGridFooter] = useState(10);
-  const scrollRef = useRef<any>();
-  const textArea = useRef<any>();
+  const chatBodyRef = useRef<HTMLDivElement | null>(null);
+  const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
   const {
     msgSend,
     msgInput,
@@ -44,19 +52,6 @@ export default function ChatContainerComponent(props: chatContainerProps) {
   } = useMessageAction(receiver);
 
   // function handler
-  const handleEnterPress = (event: KeyboardEvent<HTMLTextAreaElement>) => {
-    textArea.current.style.height = "auto";
-    const textAreaElementHtml = event.target as HTMLTextAreaElement;
-    let scHeight = textAreaElementHtml.scrollHeight;
-    textArea.current.style.height = `${scHeight}px`;
-    if (scHeight <= 230) {
-      textArea.current.style.overflowY = "hidden";
-      setPercentRowGridFooter(Math.ceil((scHeight / 622) * 100) + 4);
-    } else {
-      textArea.current.style.overflowY = "auto";
-    }
-  };
-
   const handleClickOutsidePicker = (event: MouseEvent) => {
     const elementHtml = event.target as HTMLElement;
     if (
@@ -102,8 +97,32 @@ export default function ChatContainerComponent(props: chatContainerProps) {
 
   // hook useEffect
   useEffect(() => {
-    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+    chatBodyRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  useEffect(() => {
+    if(chatBodyRef.current && textAreaRef.current){
+      // height textArea change base on scrollHeight textArea
+      textAreaRef.current.style.height = "auto";
+      let scHeight = textAreaRef.current.scrollHeight;
+      textAreaRef.current.style.height = `${scHeight}px`;
+      
+      // handle change height chat footer , chat body base on scrollHeight textArea
+      if (scHeight <= MAX_WIDTH_CHAT_FOOTER) {
+        textAreaRef.current.style.overflowY = "hidden"; // ẩn scroll
+        // calculate percent row grid
+        const percentRowChatFooter = (scHeight + PADDING_TOP_CHAT_FOOTER) / DEFAULT_HEIGHT_CHAT_CONTAINER * 100;
+        const percentRowChatBody = 100 - DEFAULT_PERCENT_ROW_CHAT_HEADER - percentRowChatFooter
+        // update grid-template-row for chat container
+        const chatContainer = document.querySelector('.chat') as HTMLElement;
+        chatContainer.style.gridTemplateRows = `10% ${percentRowChatBody}% ${percentRowChatFooter}%`
+        // khi height của chat footer change thì chat body cũng change , do đó scroll cần trượt xuống bottom của chat body IMMEDIATELY (do đó dùng 'auto')
+        chatBodyRef.current?.scrollIntoView({ behavior: "auto" });
+      } else {
+        textAreaRef.current.style.overflowY = "auto"; // hiện scroll
+      }
+    }
+  },[msgInput])
 
   useEffect(() => {
     document.addEventListener("click", handleClickOutsidePicker);
@@ -127,14 +146,7 @@ export default function ChatContainerComponent(props: chatContainerProps) {
   // cho updateCurrentContact, updateMessages hay nói cách khác 2 hàm update này sẽ nhận đc state mới 
 
   return (
-    <div
-      className="chat"
-      style={{
-        gridTemplateRows: `10% ${
-          100 - 10 - percentRowGridFooter
-        }% ${percentRowGridFooter}%`,
-      }}
-    >
+    <div className="chat">
       <div className="chat-header">
         <img
           src={`data:image/svg+xml;base64,${receiver.avatarImage}`}
@@ -163,7 +175,7 @@ export default function ChatContainerComponent(props: chatContainerProps) {
                 )}
                 <div
                   key={uuidv4()}
-                  ref={scrollRef}
+                  ref={chatBodyRef}
                   className={finalClassNameMessage(msg.isDeleted, isOneSelf)}
                 >
                   {isOneSelf && !msg.isDeleted && (
@@ -187,25 +199,27 @@ export default function ChatContainerComponent(props: chatContainerProps) {
         )}
       </div>
       <div className="chat-footer">
-        <div className="chat-footer__emoji">
-          <BsEmojiSmileFill
-            onClick={() => setIsShowEmojiPicker(!isShowEmojiPicker)}
-          />
-          <Picker open={isShowEmojiPicker} onEmojiClick={handleSelectEmoji} />
-        </div>
-        <div className="chat-footer__act">
-          <textarea
-            rows={1}
-            ref={textArea}
-            placeholder="type your message here"
-            onChange={handleChangeTextMessage}
-            onKeyUp={handleEnterPress}
-            value={msgInput}
-          />
-          <div className="btn-send">
-            <button onClick={handleSendMessageBefore}>
-              <IoMdSend />
-            </button>
+        <div className="chat-footer-inner">
+          <div className="chat-footer-inner__emoji">
+            <BsEmojiSmileFill
+              onClick={() => setIsShowEmojiPicker(!isShowEmojiPicker)}
+            />
+            <Picker open={isShowEmojiPicker} onEmojiClick={handleSelectEmoji} />
+          </div>
+          <div className="chat-footer-inner__act">
+            <textarea
+              rows={1}
+              ref={textAreaRef}
+              placeholder="type your message here"
+              onChange={handleChangeTextMessage}
+              // onKeyUp={handleEnterPress}
+              value={msgInput}
+            />
+            <div className="btn-send">
+              <button onClick={handleSendMessageBefore}>
+                <IoMdSend />
+              </button>
+            </div>
           </div>
         </div>
       </div>
