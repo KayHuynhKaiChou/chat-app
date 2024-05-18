@@ -33,18 +33,11 @@ io.on("connection", (socket) => {
   });
   //console.log(global.onlineUsers)
 
-  socket.on("send-msg", (idReceiver) => {
-    //console.log({ data })
+  socket.on("send-msg", (idReceiver, sentMessage) => {
+    //console.log({ idReceiver, sentMessage })
     const sendUserSocket = onlineUsers.get(idReceiver);
-    // console.log({
-    //   onlineUsers : global.onlineUsers
-    // })
-    // console.log({
-    //   idReceiver : data.to,
-    //   idSockerReceiver : sendUserSocket
-    // })
     if (sendUserSocket) {
-      socket.to(sendUserSocket).emit("receive-msg");
+      socket.to(sendUserSocket).emit("receive-msg" , sentMessage);
     }
   });
 });

@@ -5,7 +5,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
 
 interface FormSignInProps {
-  handleSignIn : (values : User) => void
+  handleSignIn : (values : Account) => void
 }
 
 function FormSignInComponent(props : FormSignInProps) {

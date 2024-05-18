@@ -6,30 +6,42 @@ import { useState, useEffect, useRef, KeyboardEvent } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { IconButton, Tooltip } from "@mui/material";
 import { AiOutlineDelete } from "react-icons/ai";
-import { Socket } from "socket.io-client";
-import useMessageAction from "../../hooks/useMessageAction";
+import useMessageAction from "../../hooks/useMessage";
 import { formatDateBetweenMsg } from "./ChatContainer.util";
 
 interface chatContainerProps {
   receiver: User;
-  socket: Socket;
+  showListContacts: () => Promise<void>;
+  handleSocketOn: (listCallbackAsync: Array<(newMessage : MessageData) => void>) => void
+  handleSocketEmit: (idReceiver : string , sentMessage : MessageData) => void;
+  handleSocketOff: () => void;
+  updateCurrentContact: (newMessage : MessageData) => void
 }
 
 export default function ChatContainerComponent(props: chatContainerProps) {
-  const { receiver, socket } = props;
+  const { 
+    receiver,
+    showListContacts, 
+    handleSocketOn,
+    handleSocketEmit,
+    handleSocketOff,
+    updateCurrentContact
+  } = props;
   const user = JSON.parse(localStorage.getItem("user") as string);
   const [isShowEmojiPicker, setIsShowEmojiPicker] = useState(false);
   const [percentRowGridFooter, setPercentRowGridFooter] = useState(10);
   const scrollRef = useRef<any>();
   const textArea = useRef<any>();
   const {
+    msgSend,
     msgInput,
     messages,
     handleSendMessage,
-    handleDeleteMsg,
+    handleDeleteMessage,
     handleSelectEmoji,
     handleChangeTextMessage,
-  } = useMessageAction(socket, user, receiver);
+    updateMessages
+  } = useMessageAction(receiver);
 
   // function handler
   const handleEnterPress = (event: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -54,6 +66,18 @@ export default function ChatContainerComponent(props: chatContainerProps) {
       setIsShowEmojiPicker(false);
     }
   };
+
+  const handleSendMessageBefore = async () => {
+    const sentMessage = await handleSendMessage();
+    await showListContacts();
+    handleSocketEmit(msgSend.to , sentMessage);
+  }
+
+  const handleDeleteMessageBefore = async (idMessage : MessageData['_id']) => {
+    const deletedMessage = await handleDeleteMessage(idMessage); 
+    await showListContacts();
+    handleSocketEmit(msgSend.to , deletedMessage);
+  }
 
   const showFinalMessage = (msgData: MessageData, isOneSelf: boolean) => {
     if (msgData.isDeleted) {
@@ -87,6 +111,20 @@ export default function ChatContainerComponent(props: chatContainerProps) {
       document.removeEventListener("click", handleClickOutsidePicker);
     };
   }, []);
+
+  useEffect(() => {
+    handleSocketOn([
+      updateCurrentContact,
+      updateMessages
+    ])
+    
+    return () => {
+      // Clean up the event listener when the component unmounts
+      handleSocketOff()
+    };
+  }, [receiver , messages]);
+  // lý do có dependence messages là để useEffect này chạy lại sau khi send msg để đăng kí tham chiếu mới
+  // cho updateCurrentContact, updateMessages hay nói cách khác 2 hàm update này sẽ nhận đc state mới 
 
   return (
     <div
@@ -130,7 +168,7 @@ export default function ChatContainerComponent(props: chatContainerProps) {
                 >
                   {isOneSelf && !msg.isDeleted && (
                     <Tooltip title="Delete this message">
-                      <IconButton onClick={() => handleDeleteMsg(msg._id)}>
+                      <IconButton onClick={() => handleDeleteMessageBefore(msg._id)}>
                         <AiOutlineDelete />
                       </IconButton>
                     </Tooltip>
@@ -165,7 +203,7 @@ export default function ChatContainerComponent(props: chatContainerProps) {
             value={msgInput}
           />
           <div className="btn-send">
-            <button onClick={handleSendMessage}>
+            <button onClick={handleSendMessageBefore}>
               <IoMdSend />
             </button>
           </div>

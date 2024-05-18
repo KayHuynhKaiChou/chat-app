@@ -1,31 +1,30 @@
-import { useEffect, useState , useRef} from 'react';
 import ContactsComponent from '../../components/ContactsComponent/ContactsComponent'
 import WelcomeComponent from '../../components/WelcomeComponent/WelcomeComponent'
 import './chat.scss'
-import userServices from '../../services/userServices';
 import ChatContainerComponent from '../../components/ChatContainerComponent/ChatContainerComponent';
-import { Socket, io } from "socket.io-client";
+import useContactAction from '../../hooks/useContact';
+import useSocketConnect from '../../hooks/useSocketConnect';
 
 export default function ChatPage() {
-  const socket = useRef<Socket | null>(null);
-  const [listContacts , setListContacts] = useState<Contact[]>([]); 
-  const [currentContact , setCurrentContact] = useState<Contact | null>(null);
   const user = JSON.parse(localStorage.getItem('user') as string);
+  const {
+    socket,
+    handleSocketOn,
+    handleSocketEmit,
+    handleSocketOff
+  } = useSocketConnect(); 
+
+  const {
+    currentContact,
+    listContacts,
+    setCurrentContact,
+    showListContacts,
+    updateCurrentContact
+  } = useContactAction();
 
   const handleChangeCurrentContact = (contact : Contact) => {
     setCurrentContact(contact);
   }
-
-  useEffect(() => {
-    userServices.getAllUsersService(user.id).then(res => setListContacts(res.data))
-  },[])
-
-  useEffect(() => {
-    if (user) {
-      socket.current = io("http://localhost:1832");
-      socket.current.emit("add-user", user.id);
-    }
-  }, []);
 
   return (
     <div className='chat-page'>
@@ -35,10 +34,14 @@ export default function ChatPage() {
           listContacts={listContacts}
           onChangeCurrentContact={handleChangeCurrentContact}
         />
-        {(currentContact && socket.current) ? (
+        {(currentContact && socket) ? (
           <ChatContainerComponent
             receiver={currentContact.receiver}
-            socket={socket.current}
+            showListContacts={showListContacts}
+            handleSocketOn={handleSocketOn}
+            handleSocketEmit={handleSocketEmit}
+            handleSocketOff={handleSocketOff}
+            updateCurrentContact={updateCurrentContact}
           />
         ) : (
           <WelcomeComponent nameuser={user.username}/>

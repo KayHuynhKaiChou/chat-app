@@ -9,9 +9,9 @@ import { AiOutlineSearch } from "react-icons/ai";
 import userServices from '../../services/userServices';
 
 interface contactsProps {
-    user : User,
-    listContacts : Contact[],
-    onChangeCurrentContact : (contact : Contact) => void
+    user : User;
+    listContacts : Contact[];
+    onChangeCurrentContact : (contact : Contact) => void;
 }
 
 export default function ContactsComponent(props : contactsProps) {
