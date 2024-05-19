@@ -4,9 +4,11 @@ import logoChat from '../../assets/logoChat.svg'
 import {useEffect, useState} from 'react'
 import './contacts.scss'
 import { AiOutlineLogout } from "react-icons/ai";
-import { Fade, IconButton, InputBase, Tooltip } from '@mui/material';
+import { IconButton, InputBase } from '@mui/material';
 import { AiOutlineSearch } from "react-icons/ai";
 import userServices from '../../services/userServices';
+import { v4 as uuidv4 } from "uuid";
+import CaTooltip from '../common/CaTooltip';
 
 interface contactsProps {
     user : User;
@@ -17,9 +19,9 @@ interface contactsProps {
 export default function ContactsComponent(props : contactsProps) {
     const {user , listContacts , onChangeCurrentContact} = props;
     const navigate = useNavigate();
-    const [selectedContact , setSelectedContact] = useState(-1);
-    const [contacts , setContacts] = useState(listContacts)
-    const [searchText , setSearchText] = useState('');
+    const [selectedContact , setSelectedContact] = useState<number>(-1);
+    const [contacts , setContacts] = useState<Contact[]>(listContacts);
+    const [searchText , setSearchText] = useState<string>('');
 
     useEffect(() => {
         setContacts(listContacts)
@@ -61,15 +63,6 @@ export default function ContactsComponent(props : contactsProps) {
         }
     }
 
-    const isShowTooltip = (index : number) => {
-        const listNewMsgElementHtml = document.querySelectorAll('.item-detailInfo .item-detailInfo__msg');
-        const newMsgElementHtml = listNewMsgElementHtml[index]
-        return !!(
-            newMsgElementHtml && 
-            newMsgElementHtml.scrollWidth > newMsgElementHtml.clientWidth
-        )
-    }
-
     return (
         <div className="contacts">
             <div className="contacts-title">
@@ -100,7 +93,7 @@ export default function ContactsComponent(props : contactsProps) {
                 ) : 
                 contacts.map(({receiver , newMessage} ,index) => (
                     <div 
-                        key={index}
+                        key={uuidv4()}
                         className={`contacts-list__item ${selectedContact === index ? 'isSelected' : ''}`}
                         onClick={() => handleChangeContact({receiver , newMessage} ,index)}
                     >
@@ -112,17 +105,13 @@ export default function ContactsComponent(props : contactsProps) {
                                 <div className="item-detailInfo__name">
                                     {receiver.username}
                                 </div>
-                                <Tooltip
-                                    disableHoverListener={!isShowTooltip(index)}
-                                    title={showNewMessage(newMessage , receiver)}
-                                    placement='bottom-start'
-                                    TransitionComponent={Fade}
-                                    TransitionProps={{ timeout: 600 }}
+                                <CaTooltip
+                                    id={`tooltip-new-message-${index}`}
                                 >
                                     <div className="item-detailInfo__msg">
                                         {showNewMessage(newMessage , receiver)}
                                     </div>
-                                </Tooltip>    
+                                </CaTooltip>    
                             </div>
                         </div>
                     </div>

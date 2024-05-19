@@ -8,6 +8,7 @@ import { IconButton, Tooltip } from "@mui/material";
 import { AiOutlineDelete } from "react-icons/ai";
 import useMessageAction from "../../hooks/useMessage";
 import { formatDateBetweenMsg } from "./ChatContainer.util";
+import CaTooltip from "../common/CaTooltip";
 
 interface chatContainerProps {
   receiver: User;
@@ -179,11 +180,15 @@ export default function ChatContainerComponent(props: chatContainerProps) {
                   className={finalClassNameMessage(msg.isDeleted, isOneSelf)}
                 >
                   {isOneSelf && !msg.isDeleted && (
-                    <Tooltip title="Delete this message">
+                    <CaTooltip 
+                      id={`icon-tooltip-${uuidv4()}`}
+                      title={<div>Delete this message</div>}
+                      placement="bottom"
+                    >
                       <IconButton onClick={() => handleDeleteMessageBefore(msg._id)}>
                         <AiOutlineDelete />
                       </IconButton>
-                    </Tooltip>
+                    </CaTooltip>
                   )}
                   {!isOneSelf && (
                     <img
