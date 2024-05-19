@@ -108,7 +108,10 @@ export default function ContactsComponent(props : contactsProps) {
                                 <CaTooltip
                                     id={`tooltip-new-message-${index}`}
                                 >
-                                    <div className="item-detailInfo__msg">
+                                    <div 
+                                        id={`tooltip-new-message-${index}`}
+                                        className="item-detailInfo__msg"
+                                    >
                                         {showNewMessage(newMessage , receiver)}
                                     </div>
                                 </CaTooltip>    

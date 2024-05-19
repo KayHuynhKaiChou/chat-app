@@ -21,13 +21,44 @@ export default function CaTooltip({
     const childrenInnerTooltip = useRef<HTMLElement | null>(null);
     const [disableListener , setDisableListener] = useState(false);
 
+    // func handle logic and change state
+    function checkTextExceedWidthLimit(containerText : HTMLElement){
+        const isDisabledEvent = !title && containerText && containerText.scrollWidth <= containerText.clientWidth
+        setDisableListener(isDisabledEvent)
+    } 
+
+    // use hook
+    // when resize window , clientWidth will change , do đó text sẽ có dấu ... ở cuối
+    // => cần check lại bằng func checkTextExceedWidthLimit
     useEffect(() => {
-        if(!title &&
-           childrenInnerTooltip.current && 
-           childrenInnerTooltip.current.scrollWidth <= childrenInnerTooltip.current.clientWidth
-        ){
-            setDisableListener(true)
-        }
+        // use debounce để sau khi end resize window mới call func checkTextExceedWidthLimit
+        let resizeTimeout = 0;
+    
+        const handleResize = () => {
+            // Clear the timeout as the resize event is still ongoing
+            clearTimeout(resizeTimeout);
+            
+            // Set a timeout to run after 500ms of no resize events
+            resizeTimeout = setTimeout(() => {
+                // Ko có cách nào để re-render lại component ContactsComponent từ CaTooltip , nên childrenInnerTooltip
+                // vẫn keep state cũ khi resize window vì resize ko thể re-render ContactsComponent
+                // Solution : Lấy trực tiếp ele children trong tooltip thông qua getElementById khi đang thực hiện resize
+                const elementInnerTooltip = document.getElementById(id+'') as HTMLElement
+                checkTextExceedWidthLimit(elementInnerTooltip)
+            }, 500); // Adjust the delay as needed
+        };
+    
+        window.addEventListener('resize', handleResize);
+    
+        // Clean up the event listener on unmount
+        return () => {
+          window.removeEventListener('resize', handleResize);
+          clearTimeout(resizeTimeout); // Clean up the timeout if the component unmounts
+        };
+    }, []);
+
+    useEffect(() => {
+        checkTextExceedWidthLimit(childrenInnerTooltip.current!)
     },[children])
 
     const customStyleInnerTooltip : React.CSSProperties = {
