@@ -13,6 +13,6 @@ interface User extends Account{
 
 
 interface Contact {
-    receiver : User,
-    newMessage : MessageData 
+    receiver : User;
+    newMessage : MessageData;
 }

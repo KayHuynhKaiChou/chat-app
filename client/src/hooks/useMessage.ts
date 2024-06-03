@@ -62,17 +62,19 @@ export default function useMessageAction(
      * @param newMessage có thể là msg được gửi hoặc msg đã bị xóa từ sender
      */
     const updateMessages = (newMessage : MessageData) => {
-        // when delete message
-        if(newMessage.isDeleted){
-            const messagesClone = [...messages];
-            const deletedMessage = messagesClone.find(msg => msg._id == newMessage._id)
-            if(deletedMessage) {
-                deletedMessage.isDeleted = true
+        if(newMessage.sender == currentContact.id){
+            // when delete message
+            if(newMessage.isDeleted){
+                const messagesClone = [...messages];
+                const deletedMessage = messagesClone.find(msg => msg._id == newMessage._id)
+                if(deletedMessage) {
+                    deletedMessage.isDeleted = true
+                }
+                setMessages(messagesClone)
+            // when send new message
+            }else{
+                setMessages([...messages , newMessage])
             }
-            setMessages(messagesClone)
-        // when send new message
-        }else{
-            setMessages([...messages , newMessage])
         }
     }
 

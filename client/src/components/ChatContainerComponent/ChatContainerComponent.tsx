@@ -4,7 +4,7 @@ import { IoMdSend } from "react-icons/io";
 import Picker from "emoji-picker-react";
 import { useState, useEffect, useRef} from "react";
 import { v4 as uuidv4 } from "uuid";
-import { IconButton, Tooltip } from "@mui/material";
+import { IconButton } from "@mui/material";
 import { AiOutlineDelete } from "react-icons/ai";
 import useMessageAction from "../../hooks/useMessage";
 import { formatDateBetweenMsg } from "./ChatContainer.util";

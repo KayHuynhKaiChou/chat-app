@@ -16,6 +16,10 @@ class messageServices {
         const res = await axios.delete(`${API_URL}/message/delete-message/${idMsg}`);
         return res.data
     }
+
+    updateViewersMessage = async (idsViewers : MessageData) => {
+        await axios.put(`${API_URL}/message/update-viewers`, idsViewers)
+    }
 }
 
 export default new messageServices

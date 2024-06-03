@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 // @ts-ignore
 import logoChat from '../../assets/logoChat.svg'
-import {useEffect, useState} from 'react'
+import {CSSProperties, useEffect, useState} from 'react'
 import './contacts.scss'
 import { AiOutlineLogout } from "react-icons/ai";
 import { IconButton, InputBase } from '@mui/material';
@@ -19,7 +19,7 @@ interface contactsProps {
 export default function ContactsComponent(props : contactsProps) {
     const {user , listContacts , onChangeCurrentContact} = props;
     const navigate = useNavigate();
-    const [selectedContact , setSelectedContact] = useState<number>(-1);
+    const [selectedContactId , setSelectedContactId] = useState<User['id']>('');
     const [contacts , setContacts] = useState<Contact[]>(listContacts);
     const [searchText , setSearchText] = useState<string>('');
 
@@ -32,8 +32,8 @@ export default function ContactsComponent(props : contactsProps) {
         navigate('/sign-in')
     }
 
-    const handleChangeContact = (contact : Contact , index : number) => {
-        setSelectedContact(index);
+    const handleChangeContact = (contact : Contact) => {
+        setSelectedContactId(contact.receiver.id);
         onChangeCurrentContact(contact);
     }
 
@@ -60,6 +60,21 @@ export default function ContactsComponent(props : contactsProps) {
             }
         }else{
             return 'Not message in this conversation.'
+        }
+    }
+
+    const styleViewedMessage = (newMessage : MessageData) : CSSProperties => {
+        if(!newMessage) return {};
+        if(
+            newMessage.sender == user.id ||
+            newMessage.viewers.includes(user.id)
+        ){
+            return {}
+        }else{
+            return {
+                color: '#fff',
+                fontWeight: 'bold'
+            }
         }
     }
 
@@ -94,8 +109,8 @@ export default function ContactsComponent(props : contactsProps) {
                 contacts.map(({receiver , newMessage} ,index) => (
                     <div 
                         key={uuidv4()}
-                        className={`contacts-list__item ${selectedContact === index ? 'isSelected' : ''}`}
-                        onClick={() => handleChangeContact({receiver , newMessage} ,index)}
+                        className={`contacts-list__item ${selectedContactId == receiver.id ? 'isSelected' : ''}`}
+                        onClick={() => handleChangeContact({receiver , newMessage})}
                     >
                         <div className="item-detail-wrap">
                             <div className='item-detailAvatar'>
@@ -109,6 +124,7 @@ export default function ContactsComponent(props : contactsProps) {
                                     id={`tooltip-new-message-${index}`}
                                 >
                                     <div 
+                                        style={styleViewedMessage(newMessage)}
                                         id={`tooltip-new-message-${index}`}
                                         className="item-detailInfo__msg"
                                     >

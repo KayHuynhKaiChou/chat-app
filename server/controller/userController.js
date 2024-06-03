@@ -96,8 +96,9 @@ class userController {
                     newMessage
                 }
             });
-            const modifiedListUsers = await Promise.all(modifiedListUsersPromise)
-            res.status(200).json(status200("Get all users success", modifiedListUsers));
+            const modifiedListUsers = await Promise.all(modifiedListUsersPromise);
+            const sortListContacts = baseService.sortListContactsByNewMessage(modifiedListUsers);
+            res.status(200).json(status200("Get all users success", sortListContacts));
         } catch (error) {
             status500(error)
         }

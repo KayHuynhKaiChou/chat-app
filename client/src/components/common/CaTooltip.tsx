@@ -19,12 +19,15 @@ export default function CaTooltip({
     placement = 'bottom-start'
 } : CaTooltip ) {
     const childrenInnerTooltip = useRef<HTMLElement | null>(null);
-    const [disableListener , setDisableListener] = useState(false);
+    //const [disableListener , setDisableListener] = useState(false);
 
     // func handle logic and change state
-    function checkTextExceedWidthLimit(containerText : HTMLElement){
-        const isDisabledEvent = !title && containerText && containerText.scrollWidth <= containerText.clientWidth
-        setDisableListener(isDisabledEvent)
+    function checkTextExceedWidthLimit(containerText : HTMLElement | null){
+        if(containerText){
+            const isDisabledEvent = !title && containerText && containerText.scrollWidth <= containerText.clientWidth
+            containerText.style.pointerEvents = isDisabledEvent ? 'none' : 'auto'
+        }
+        //setDisableListener(isDisabledEvent)
     } 
 
     // use hook
@@ -58,7 +61,7 @@ export default function CaTooltip({
     }, []);
 
     useEffect(() => {
-        checkTextExceedWidthLimit(childrenInnerTooltip.current!)
+        checkTextExceedWidthLimit(childrenInnerTooltip.current)
     },[children])
 
     const customStyleInnerTooltip : React.CSSProperties = {
@@ -84,7 +87,7 @@ export default function CaTooltip({
             placement={placement}
             TransitionComponent={Fade}
             TransitionProps={{ timeout: 600 }}
-            style={{pointerEvents : disableListener ? 'none' : 'auto'}}
+            //style={{pointerEvents : disableListener ? 'none' : 'auto'}}
         >
             {children}
         </Tooltip>

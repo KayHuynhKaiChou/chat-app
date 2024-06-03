@@ -6,5 +6,6 @@ const messageRoute = express.Router();
 messageRoute.post('/send-messages' , messageController.addMessages)
 messageRoute.get('/get-messages' , messageController.getMessages)
 messageRoute.delete('/delete-message/:id' , messageController.deleteMessage)
+messageRoute.put('/update-viewers' , messageController.updateViewersMessage)
 
 export default messageRoute

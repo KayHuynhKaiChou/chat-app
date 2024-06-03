@@ -70,13 +70,14 @@
                         white-space: nowrap; /* Ngăn chặn việc ngắt dòng */
                         overflow: hidden; /* Ẩn phần nội dung vượt quá */
                         text-overflow: ellipsis;
+                        color : #B0B3B8;
                     }
                 }
             }
         }
 
         .isSelected {
-            background-color: #9a86f3;
+            background-color: #664cda;
         }
     }
 

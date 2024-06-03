@@ -10,7 +10,8 @@ class messageController {
             const newMsg = new MessageModel({
                 message,
                 users : [from , to],
-                sender : from 
+                sender : from ,
+                viewers : from
             })
             await newMsg.save();
             res.status(200).json(status200("send message to "+to+" successfully", newMsg))
@@ -23,7 +24,7 @@ class messageController {
         try {
             const { from, to } = req.query;
 
-            const messagesResult = await baseService.showConversationBetween(from , to)
+            const messagesResult = await baseService.showConversationBetween(from , to);
 
             res.status(200).json(status200(
                 `get data messages between ${from} and ${to} successfully`,
@@ -45,6 +46,27 @@ class messageController {
             
             res.status(200).json(status200(`Delete message successfully`,null))
             
+        } catch (error) {
+            status500(error)
+        }
+    }
+
+    updateViewersMessage = async (req, res) => {
+        try {
+            const newMessage = req.body
+            // const lastMessage = await MessageModel
+            //     .findOne({
+            //         users: { $all: [userAId, userBId] }
+            //     })
+            //     .sort({ createdAt: -1 }) // Sort by creation time in descending order
+            //     .exec();            
+            const update = await MessageModel.findByIdAndUpdate(
+                newMessage._id,
+                newMessage,
+                {new : true}
+            )
+            console.log({update})
+            res.status(200).json(status200("Update viewers in conversation successfully!",null))           
         } catch (error) {
             status500(error)
         }

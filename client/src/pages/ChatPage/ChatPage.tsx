@@ -7,6 +7,7 @@ import useSocketConnect from '../../hooks/useSocketConnect';
 
 export default function ChatPage() {
   const user = JSON.parse(localStorage.getItem('user') as string);
+  // custom hooks
   const {
     socket,
     handleSocketOn,
@@ -18,6 +19,7 @@ export default function ChatPage() {
     currentContact,
     listContacts,
     setCurrentContact,
+    setListContacts,
     showListContacts,
     updateCurrentContact
   } = useContactAction();

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import userServices from "../services/userServices";
+import messageServices from "../services/messageServices";
 
 export default function useContactAction() {
     const [currentContact , setCurrentContact] = useState<Contact | null>(null);
@@ -12,34 +13,53 @@ export default function useContactAction() {
         setListContacts(res.data)
     }
 
+    const updateViewersMessage = (newMessage : MessageData) => {
+        if(currentContact?.receiver.id == newMessage.sender){
+          newMessage.viewers.push(user.id)
+        }
+        return newMessage
+    }
+
+    const sortListContacts = () => {
+        const listContactsNotMessage = listContacts.filter(con => !con.newMessage)
+        const listContactsHasMessage = listContacts.filter(con => con.newMessage)
+        listContactsHasMessage.sort((conPrev , conNext) => {
+            const datePrev = new Date(conPrev.newMessage.createdAt).getTime();
+            const dateNext = new Date(conNext.newMessage.createdAt).getTime();
+            return dateNext - datePrev
+        })
+        setListContacts([...listContactsHasMessage , ...listContactsNotMessage])
+    }
+
     /**
      * update lại listContacts và current contact cho receiver khi socket.on()
      * ko nên call API ở func này sẽ làm cho quá trình real-time bị chậm giữa sender and receiver
      * @param newMessage có thể là msg được gửi hoặc msg đã bị xóa từ sender
      */
-    const updateCurrentContact = (newMessage : MessageData) => {
-        const isDeletedNotLastMessage = currentContact!.newMessage._id != newMessage._id && newMessage.isDeleted
-
-        if(isDeletedNotLastMessage) return;
-
-        const updatedCurrentContact = {
-            ...currentContact,
-            newMessage
-        } as Contact
-
-        setCurrentContact(updatedCurrentContact)
-        
-        const listContactsClone = [...listContacts]
-        const foundCurrentContact = listContactsClone.find(cont => cont.receiver.id == updatedCurrentContact.receiver.id)       
-        
+    const updateCurrentContact = async (newMessage : MessageData) => {
+        const listContactsClone = [...listContacts];
+        const foundCurrentContact = listContactsClone.find(contact => contact.receiver.id == newMessage.sender);
         if(foundCurrentContact){
+            newMessage = updateViewersMessage(newMessage)
             foundCurrentContact.newMessage = newMessage
+            if(newMessage.sender == currentContact?.receiver.id){
+                setCurrentContact(foundCurrentContact)
+                if(newMessage.viewers.length == 2){
+                    await messageServices.updateViewersMessage(newMessage)
+                }
+            }
+            sortListContacts()
         }
-
-        setListContacts(listContactsClone)
     }
 
     // hook useEffect
+    useEffect(() => {
+        // đi lấy last msg
+        if(currentContact && currentContact.newMessage){
+            updateCurrentContact(currentContact.newMessage)
+        }
+    },[currentContact])
+
     useEffect(() => {
         showListContacts()
     },[])
