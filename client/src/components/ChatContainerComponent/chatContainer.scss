@@ -15,6 +15,23 @@
             width: 50px;
             height: 50px;
         }
+
+        &__infor{
+            display: flex;
+            flex-direction: column;
+
+            .infor-name{
+                font-size: 18px;
+                color: #ffff;
+                font-weight: bold;
+            }
+
+            .infor-status{
+                font-size: 14px;
+                font-weight: 300;
+            }
+            
+        }
     }
 
     &-body{

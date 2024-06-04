@@ -18,6 +18,7 @@ const server = app.listen(process.env.PORT, () =>
   console.log(`Server started on http://localhost:${process.env.PORT}`)
 );
 
+// apply socket.io
 const io = new Server(server, {
   pingTimeout: 60000,
   cors: {
@@ -31,16 +32,32 @@ io.on("connection", (socket) => {
   // global.chatSocket = socket;
   socket.on("add-user", (userId) => {
     onlineUsers.set(userId, socket.id);
+    const onlineUserObjs = Object.fromEntries(onlineUsers)
+    // Phát sự kiện đến tất cả các socket, bao gồm cả socket hiện tại
+    io.emit('get-users-online', Object.keys(onlineUserObjs))
   });
   //console.log(global.onlineUsers)
 
   socket.on("send-msg", (idReceiver, sentMessage) => {
-    //console.log({ idReceiver, sentMessage })
     const sendUserSocket = onlineUsers.get(idReceiver);
     if (sendUserSocket) {
       socket.to(sendUserSocket).emit("receive-msg" , sentMessage);
     }
   });
+
+  socket.on("disconnect", () => {
+    // Tìm user đã ngắt kết nối và xóa khỏi onlineUsers
+    for (let [userId, socketId] of onlineUsers) {
+      if (socketId === socket.id) {
+        onlineUsers.delete(userId);
+        break;
+      }
+    }
+    
+    const onlineUserObjs = Object.fromEntries(onlineUsers)
+    // Phát sự kiện đến tất cả các socket, bao gồm cả socket hiện tại
+    io.emit('get-users-online', Object.keys(onlineUserObjs))
+  })
 });
 
 mongoose.set('strictQuery',false);

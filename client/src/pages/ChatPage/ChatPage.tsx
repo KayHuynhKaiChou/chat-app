@@ -2,14 +2,16 @@ import ContactsComponent from '../../components/ContactsComponent/ContactsCompon
 import WelcomeComponent from '../../components/WelcomeComponent/WelcomeComponent'
 import './chat.scss'
 import ChatContainerComponent from '../../components/ChatContainerComponent/ChatContainerComponent';
-import useContactAction from '../../hooks/useContact';
+import useContact from '../../hooks/useContact';
 import useSocketConnect from '../../hooks/useSocketConnect';
+import { useEffect } from 'react';
 
 export default function ChatPage() {
   const user = JSON.parse(localStorage.getItem('user') as string);
   // custom hooks
   const {
     socket,
+    userOnlineIds,
     handleSocketOn,
     handleSocketEmit,
     handleSocketOff
@@ -18,15 +20,29 @@ export default function ChatPage() {
   const {
     currentContact,
     listContacts,
-    setCurrentContact,
     setListContacts,
+    setCurrentContact,
     showListContacts,
-    updateCurrentContact
-  } = useContactAction();
+    updateCurrentContact,
+    updateContactsOnline
+  } = useContact();
 
+  // func change state
   const handleChangeCurrentContact = (contact : Contact) => {
     setCurrentContact(contact);
   }
+
+  const handleChangeListContacts = (listContacts : Contact[]) => {
+    setListContacts(listContacts)
+  }
+
+  useEffect(() => {
+    if(userOnlineIds.length > 0 && listContacts.length > 0){ 
+      updateContactsOnline(userOnlineIds)
+    }
+    // nếu ko có dependency listContacts.length thì lần đầu chạy useEffect này thì listContacts vẫn là []
+    // sau khi call API setListContacts thì nên kích hoạt lại useEffect này 1 lần nữa
+  },[userOnlineIds , listContacts.length])
 
   return (
     <div className='chat-page'>
@@ -34,6 +50,7 @@ export default function ChatPage() {
         <ContactsComponent 
           user={user} 
           listContacts={listContacts}
+          onChangeListContacts={handleChangeListContacts}
           onChangeCurrentContact={handleChangeCurrentContact}
         />
         {(currentContact && socket) ? (

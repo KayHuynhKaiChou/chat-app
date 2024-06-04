@@ -1,10 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 // @ts-ignore
 import logoChat from '../../assets/logoChat.svg'
-import {CSSProperties, useEffect, useState} from 'react'
+import {CSSProperties, useState} from 'react'
 import './contacts.scss'
 import { AiOutlineLogout } from "react-icons/ai";
-import { IconButton, InputBase } from '@mui/material';
+import { Badge, IconButton, InputBase } from '@mui/material';
 import { AiOutlineSearch } from "react-icons/ai";
 import userServices from '../../services/userServices';
 import { v4 as uuidv4 } from "uuid";
@@ -14,18 +14,19 @@ interface contactsProps {
     user : User;
     listContacts : Contact[];
     onChangeCurrentContact : (contact : Contact) => void;
+    onChangeListContacts : (listContacts : Contact[]) => void;
 }
 
 export default function ContactsComponent(props : contactsProps) {
-    const {user , listContacts , onChangeCurrentContact} = props;
+    const {
+        user , 
+        listContacts , 
+        onChangeCurrentContact,
+        onChangeListContacts
+    } = props;
     const navigate = useNavigate();
     const [selectedContactId , setSelectedContactId] = useState<User['id']>('');
-    const [contacts , setContacts] = useState<Contact[]>(listContacts);
     const [searchText , setSearchText] = useState<string>('');
-
-    useEffect(() => {
-        setContacts(listContacts)
-    },[listContacts])
 
     const handleLogout = () => {
         localStorage.removeItem('user');
@@ -48,7 +49,7 @@ export default function ContactsComponent(props : contactsProps) {
 
     const handleSearchUsers = (searchText : string) => {
         userServices.searchUsersService(searchText , user.id as string)
-            .then(res => setContacts(res.data))
+            .then(res => onChangeListContacts(res.data))
     }
 
     const showNewMessage = (newMessage : MessageData , receiver : User) => {
@@ -101,12 +102,12 @@ export default function ContactsComponent(props : contactsProps) {
                 </IconButton>
             </div>
             <div className="contacts-list">
-                {contacts.length === 0 ? (
+                {listContacts.length === 0 ? (
                     <div className="contacts-list__empty">
                         Danh sách người dùng trống
                     </div>
                 ) : 
-                contacts.map(({receiver , newMessage} ,index) => (
+                listContacts.map(({receiver , newMessage} ,index) => (
                     <div 
                         key={uuidv4()}
                         className={`contacts-list__item ${selectedContactId == receiver.id ? 'isSelected' : ''}`}
@@ -114,7 +115,9 @@ export default function ContactsComponent(props : contactsProps) {
                     >
                         <div className="item-detail-wrap">
                             <div className='item-detailAvatar'>
-                                <img src={`data:image/svg+xml;base64,${receiver.avatarImage}`} alt="" />
+                                <Badge invisible={!receiver.isOnline} color="success" overlap="circular" badgeContent=" ">
+                                    <img src={`data:image/svg+xml;base64,${receiver.avatarImage}`} alt="" />
+                                </Badge>
                             </div>
                             <div className="item-detailInfo">
                                 <div className="item-detailInfo__name">

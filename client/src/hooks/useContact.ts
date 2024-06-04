@@ -10,7 +10,32 @@ export default function useContactAction() {
     // function handle logic and change state
     const showListContacts = async () => {
         const res = await userServices.getListContactsService(user.id);
-        setListContacts(res.data)
+        let listContactsData : Contact[] = res.data;
+        listContactsData = listContactsData.map(con => {
+            return {
+                ...con,
+                receiver : {
+                    ...con.receiver,
+                    isOnline : false
+                }
+            }
+        })
+        setListContacts(listContactsData)
+    }
+
+    const updateContactsOnline = (userOnlineIds : User['id'][]) => {
+        const mapListContacts = listContacts.map(con => {
+            const isOnline = userOnlineIds.includes(con.receiver.id)
+            return {
+                ...con,
+                receiver : {
+                    ...con.receiver,
+                    isOnline : isOnline
+                }
+            }
+        })
+        console.log(mapListContacts.map(con => con.receiver.isOnline))
+        setListContacts(mapListContacts)
     }
 
     const updateViewersMessage = (newMessage : MessageData) => {
@@ -56,12 +81,12 @@ export default function useContactAction() {
     useEffect(() => {
         // đi lấy last msg
         if(currentContact && currentContact.newMessage){
-            updateCurrentContact(currentContact.newMessage)
+            updateCurrentContact(currentContact.newMessage);
         }
     },[currentContact])
 
     useEffect(() => {
-        showListContacts()
+        showListContacts();
     },[])
 
     return {
@@ -72,6 +97,7 @@ export default function useContactAction() {
         setCurrentContact,
         setListContacts,
         showListContacts,
-        updateCurrentContact
+        updateCurrentContact,
+        updateContactsOnline
     }
 }

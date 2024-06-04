@@ -57,7 +57,7 @@ export default function ChatContainerComponent(props: chatContainerProps) {
     const elementHtml = event.target as HTMLElement;
     if (
       !elementHtml.closest(".EmojiPickerReact") &&
-      !elementHtml.closest(".chat-footer__emoji svg")
+      !elementHtml.closest(".chat-footer-inner__emoji svg")
     ) {
       setIsShowEmojiPicker(false);
     }
@@ -153,7 +153,10 @@ export default function ChatContainerComponent(props: chatContainerProps) {
           src={`data:image/svg+xml;base64,${receiver.avatarImage}`}
           alt="avatar"
         />
-        <h3>{receiver.username}</h3>
+        <div className="chat-header__infor">
+          <div className="infor-name">{receiver.username}</div>
+          <div className="infor-status">{receiver.isOnline ? 'đang hoạt động' : 'đã dừng hoạt động'}</div>
+        </div>
       </div>
       <div className="chat-body">
         {messages.length === 0 ? (
@@ -170,7 +173,7 @@ export default function ChatContainerComponent(props: chatContainerProps) {
             );
 
             return (
-              <>
+              <div key={uuidv4()}>
                 {dateFormat && (
                   <div style={{ textAlign: "center" }}>{dateFormat}</div>
                 )}
@@ -198,7 +201,7 @@ export default function ChatContainerComponent(props: chatContainerProps) {
                   )}
                   <h3>{showFinalMessage(msg, isOneSelf)}</h3>
                 </div>
-              </>
+              </div>
             );
           })
         )}

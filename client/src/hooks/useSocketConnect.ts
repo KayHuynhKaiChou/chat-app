@@ -1,8 +1,9 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Socket, io } from "socket.io-client";
 
 export default function useSocketConnect(){
     const socket = useRef<Socket | null>(null);
+    const [userOnlineIds , setUserOnlineIds] = useState<User['id'][]>([])
     const user = JSON.parse(localStorage.getItem('user') as string);
 
     const handleSocketEmit = (idReceiver : string , sentMessage : MessageData) => {
@@ -14,10 +15,6 @@ export default function useSocketConnect(){
             listCallback.forEach(callback => {
                 callback(newMessage);
             })
-            // const promiseCallbacksCall = listCallbackAsync.map(async (callbackAsync) => {
-            //     return await callbackAsync()
-            // });
-            // await Promise.all(promiseCallbacksCall)
         });
     }
 
@@ -29,12 +26,26 @@ export default function useSocketConnect(){
         if (user) {
             socket.current = io("http://localhost:1832");
             socket.current.emit("add-user", user.id);
+            socket.current.on("get-users-online" , (onlineUserIds) => {
+                console.log({onlineUserIds})
+                setUserOnlineIds(onlineUserIds)
+            })
         }
     }, []);
+
+    // useEffect(() => {
+    //     if(socket.current){
+    //         socket.current.on("get-users-online" , (onlineUserIds) => {
+    //             console.log({onlineUserIds})
+    //             setUserOnlineIds(onlineUserIds)
+    //         })
+    //     }
+    // }, [])
 
     return {
         //state
         socket : socket.current,
+        userOnlineIds,
         // function handler
         handleSocketOn,
         handleSocketEmit,
