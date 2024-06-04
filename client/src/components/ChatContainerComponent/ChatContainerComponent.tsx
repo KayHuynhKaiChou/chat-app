@@ -2,13 +2,14 @@ import "./chatContainer.scss";
 import { BsEmojiSmileFill } from "react-icons/bs";
 import { IoMdSend } from "react-icons/io";
 import Picker from "emoji-picker-react";
-import { useState, useEffect, useRef} from "react";
+import { useState, useEffect, useRef, useMemo, useLayoutEffect} from "react";
 import { v4 as uuidv4 } from "uuid";
-import { IconButton } from "@mui/material";
+import { Badge, IconButton } from "@mui/material";
 import { AiOutlineDelete } from "react-icons/ai";
 import useMessageAction from "../../hooks/useMessage";
 import { formatDateBetweenMsg } from "./ChatContainer.util";
 import CaTooltip from "../common/CaTooltip";
+import CaLoading from "../common/CaLoading";
 
 interface chatContainerProps {
   receiver: User;
@@ -37,10 +38,18 @@ export default function ChatContainerComponent(props: chatContainerProps) {
     handleSocketOff,
     updateCurrentContact
   } = props;
+  // store
   const user = JSON.parse(localStorage.getItem("user") as string);
+  
+  //state
   const [isShowEmojiPicker, setIsShowEmojiPicker] = useState(false);
+  const [isLoading , setIsLoading] = useState<boolean>(true);
+
+  //useRef
   const chatBodyRef = useRef<HTMLDivElement | null>(null);
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
+  
+  //custom hook
   const {
     msgSend,
     msgInput,
@@ -51,8 +60,74 @@ export default function ChatContainerComponent(props: chatContainerProps) {
     handleChangeTextMessage,
     updateMessages
   } = useMessageAction(receiver);
+  
+  //useMemo
+  const MessagesEmpty = useMemo(() => {
+    return () => (
+      <div className="chat-body__empty">
+        Hiện ko có tin nhắn trong cuộc trò truyện này
+      </div>
+    ) 
+  },[])
+
+  const MessagesData = useMemo(() => {
+    return () => messages.map((msg, index, allMsg) => {
+      const isOneSelf = msg.sender === user.id;
+
+      let dateFormat = formatDateBetweenMsg(
+        index ? allMsg[index - 1].createdAt : null,
+        msg.createdAt
+      );
+
+      return (
+        <div key={uuidv4()}>
+          {dateFormat && (
+            <div style={{ textAlign: "center" }}>{dateFormat}</div>
+          )}
+          <div
+            key={uuidv4()}
+            ref={chatBodyRef}
+            className={finalClassNameMessage(msg.isDeleted, isOneSelf)}
+          >
+            {isOneSelf && !msg.isDeleted && (
+              <CaTooltip 
+                id={`icon-tooltip-${uuidv4()}`}
+                title={<div>Delete this message</div>}
+                placement="bottom"
+              >
+                <IconButton onClick={() => handleDeleteMessageBefore(msg._id)}>
+                  <AiOutlineDelete />
+                </IconButton>
+              </CaTooltip>
+            )}
+            {!isOneSelf && (
+              <img
+                src={`data:image/svg+xml;base64,${receiver.avatarImage}`}
+                alt=""
+              />
+            )}
+            <h3>{showFinalMessage(msg, isOneSelf)}</h3>
+          </div>
+        </div>
+      );
+    })
+  },[messages])
 
   // function handler
+  const renderMessages = () => {
+    if(isLoading){
+      return (
+        <CaLoading/>
+      )
+    }else{
+      if(messages.length === 0){
+        return <MessagesEmpty />
+      }else{
+        return <MessagesData />
+      }
+    }
+  }
+
   const handleClickOutsidePicker = (event: MouseEvent) => {
     const elementHtml = event.target as HTMLElement;
     if (
@@ -97,6 +172,16 @@ export default function ChatContainerComponent(props: chatContainerProps) {
   };
 
   // hook useEffect
+  useLayoutEffect(() => {
+    setIsLoading(true)
+  },[messages])
+
+  useEffect(() => {
+      setTimeout(() => {
+          setIsLoading(false);
+      }, 2000);
+  },[isLoading])
+  
   useEffect(() => {
     chatBodyRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -149,62 +234,16 @@ export default function ChatContainerComponent(props: chatContainerProps) {
   return (
     <div className="chat">
       <div className="chat-header">
-        <img
-          src={`data:image/svg+xml;base64,${receiver.avatarImage}`}
-          alt="avatar"
-        />
+        <Badge invisible={!receiver.isOnline} color="success" overlap="circular" badgeContent=" ">
+          <img src={`data:image/svg+xml;base64,${receiver.avatarImage}`} alt="" />
+        </Badge>
         <div className="chat-header__infor">
           <div className="infor-name">{receiver.username}</div>
           <div className="infor-status">{receiver.isOnline ? 'đang hoạt động' : 'đã dừng hoạt động'}</div>
         </div>
       </div>
       <div className="chat-body">
-        {messages.length === 0 ? (
-          <div className="chat-body__empty">
-            Hiện ko có tin nhắn trong cuộc trò truyện này
-          </div>
-        ) : (
-          messages.map((msg, index, allMsg) => {
-            const isOneSelf = msg.sender === user.id;
-
-            let dateFormat = formatDateBetweenMsg(
-              index ? allMsg[index - 1].createdAt : null,
-              msg.createdAt
-            );
-
-            return (
-              <div key={uuidv4()}>
-                {dateFormat && (
-                  <div style={{ textAlign: "center" }}>{dateFormat}</div>
-                )}
-                <div
-                  key={uuidv4()}
-                  ref={chatBodyRef}
-                  className={finalClassNameMessage(msg.isDeleted, isOneSelf)}
-                >
-                  {isOneSelf && !msg.isDeleted && (
-                    <CaTooltip 
-                      id={`icon-tooltip-${uuidv4()}`}
-                      title={<div>Delete this message</div>}
-                      placement="bottom"
-                    >
-                      <IconButton onClick={() => handleDeleteMessageBefore(msg._id)}>
-                        <AiOutlineDelete />
-                      </IconButton>
-                    </CaTooltip>
-                  )}
-                  {!isOneSelf && (
-                    <img
-                      src={`data:image/svg+xml;base64,${receiver.avatarImage}`}
-                      alt=""
-                    />
-                  )}
-                  <h3>{showFinalMessage(msg, isOneSelf)}</h3>
-                </div>
-              </div>
-            );
-          })
-        )}
+        {renderMessages()}
       </div>
       <div className="chat-footer">
         <div className="chat-footer-inner">

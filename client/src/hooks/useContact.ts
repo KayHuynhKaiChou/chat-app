@@ -34,8 +34,14 @@ export default function useContactAction() {
                 }
             }
         })
-        console.log(mapListContacts.map(con => con.receiver.isOnline))
         setListContacts(mapListContacts)
+        // cần update lại current contact khi list contacts đc updated
+        const foundCurrentContact = mapListContacts.find((con) => {
+            return con.receiver.id == currentContact?.receiver.id
+        })
+        if(foundCurrentContact){
+            setCurrentContact(foundCurrentContact)
+        }
     }
 
     const updateViewersMessage = (newMessage : MessageData) => {
