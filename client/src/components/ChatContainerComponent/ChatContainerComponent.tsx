@@ -80,9 +80,9 @@ export default function ChatContainerComponent(props: chatContainerProps) {
       );
 
       return (
-        <div key={uuidv4()}>
+        <div className="chat-body-inner" key={uuidv4()}>
           {dateFormat && (
-            <div style={{ textAlign: "center" }}>{dateFormat}</div>
+            <div className="chat-body__date">{dateFormat}</div>
           )}
           <div
             key={uuidv4()}

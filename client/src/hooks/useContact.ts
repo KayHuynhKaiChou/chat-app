@@ -3,13 +3,18 @@ import userServices from "../services/userServices";
 import messageServices from "../services/messageServices";
 
 export default function useContactAction() {
-    const [currentContact , setCurrentContact] = useState<Contact | null>(null);
-    const [listContacts , setListContacts] = useState<Contact[]>([]);
+    //store
     const user = JSON.parse(localStorage.getItem('user') as string);
-  
+    //state
+    const [listContacts , setListContacts] = useState<Contact[]>([]);
+    const [currentContact , setCurrentContact] = useState<Contact | null>(null);
+    const [isLoadingListContacts , setIsLoadingListContacts] = useState<boolean>(true);
     // function handle logic and change state
     const showListContacts = async () => {
         const res = await userServices.getListContactsService(user.id);
+        if(res.status == 200){
+            setIsLoadingListContacts(false);
+        }
         let listContactsData : Contact[] = res.data;
         listContactsData = listContactsData.map(con => {
             return {
@@ -99,6 +104,7 @@ export default function useContactAction() {
         //state
         currentContact,
         listContacts,
+        isLoadingListContacts,
         // function handler
         setCurrentContact,
         setListContacts,

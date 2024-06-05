@@ -36,3 +36,20 @@ img {
     background-color: #f9f9f9;
   }
 }
+
+// scss common
+
+// Skeleton
+.bl_caSkeleton{
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+  &_item{
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+  }
+}

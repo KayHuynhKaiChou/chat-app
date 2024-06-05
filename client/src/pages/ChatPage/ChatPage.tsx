@@ -7,7 +7,9 @@ import useSocketConnect from '../../hooks/useSocketConnect';
 import { useEffect } from 'react';
 
 export default function ChatPage() {
+  //store
   const user = JSON.parse(localStorage.getItem('user') as string);
+  
   // custom hooks
   const {
     socket,
@@ -20,6 +22,7 @@ export default function ChatPage() {
   const {
     currentContact,
     listContacts,
+    isLoadingListContacts,
     setListContacts,
     setCurrentContact,
     showListContacts,
@@ -48,8 +51,9 @@ export default function ChatPage() {
     <div className='chat-page'>
       <div className="chat-page__container">
         <ContactsComponent 
-          user={user} 
+          currentContact={currentContact}
           listContacts={listContacts}
+          isLoadingListContacts={isLoadingListContacts}
           onChangeListContacts={handleChangeListContacts}
           onChangeCurrentContact={handleChangeCurrentContact}
         />
