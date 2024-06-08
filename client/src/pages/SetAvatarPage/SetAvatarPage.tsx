@@ -1,6 +1,6 @@
 import { Button } from '@mui/material';
 import { patternAvatars, toastMSGObject } from '../../utils/availableMethod';
-import './setAvatar.scss'
+import './avatar.scss';
 import {useState , useEffect} from 'react';
 // @ts-ignore
 import loader from '../../assets/loader.gif';
