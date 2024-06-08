@@ -1,10 +1,11 @@
-import { BrowserRouter , Routes, Route } from "react-router-dom"
-import ChatPage from "./pages/ChatPage/ChatPage"
-import LoginPage from "./pages/LoginPage/LoginPage"
-import RegisterPage from "./pages/RegisterPage/RegisterPage"
-import SetAvatarPage from "./pages/SetAvatarPage/SetAvatarPage"
-import PrivateRoute from "./components/PrivateRoute"
+import { BrowserRouter , Routes, Route } from "react-router-dom";
+import PrivateRoute from "./components/PrivateRoute";
+import { lazy } from "react";
 
+const ChatPage = lazy(() => import('./pages/ChatPage/ChatPage'));
+const LoginPage = lazy(() => import('./pages/LoginPage/LoginPage'));
+const RegisterPage = lazy(() => import('./pages/RegisterPage/RegisterPage'));
+const SetAvatarPage = lazy(() => import('./pages/SetAvatarPage/SetAvatarPage'));
 
 function App() {
   
