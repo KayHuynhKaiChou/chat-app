@@ -14,7 +14,7 @@ function InputField(props : InputFieldProps) {
         form,
         name,
         label,
-        disabled,
+        disabled = false,
         typeInput
     } = props
     const {formState : {errors}} = form;
@@ -30,6 +30,7 @@ function InputField(props : InputFieldProps) {
                     margin="normal"
                     label={label}
                     type={typeInput}
+                    disabled={disabled}
                     fullWidth
                     error={!!hasError}
                     helperText={errors[name]?.message}

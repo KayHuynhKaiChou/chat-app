@@ -1,11 +1,11 @@
 interface Account {
-    email : string;
     username : string;
     password ?: string;
     confirmPassword ?: string;
 }
-
+    
 interface User extends Account{
+    email : string;
     id : string;
     avatarImage : string;
     isOnline : boolean; 

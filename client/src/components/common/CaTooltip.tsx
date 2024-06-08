@@ -1,5 +1,5 @@
 import { Fade, Tooltip, TooltipProps } from "@mui/material";
-import { ReactElement, useEffect, useRef, useState } from "react";
+import { ReactElement, useEffect, useRef } from "react";
 
 interface CaTooltip {
     id : TooltipProps['id'];
