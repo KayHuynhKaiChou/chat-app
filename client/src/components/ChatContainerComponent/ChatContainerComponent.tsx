@@ -85,7 +85,6 @@ export default function ChatContainerComponent(props: chatContainerProps) {
             <div className="chat-body__date">{dateFormat}</div>
           )}
           <div
-            key={uuidv4()}
             ref={chatBodyRef}
             className={finalClassNameMessage(msg.isDeleted, isOneSelf)}
           >
@@ -184,7 +183,7 @@ export default function ChatContainerComponent(props: chatContainerProps) {
   
   useEffect(() => {
     chatBodyRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages , isLoading]); // khi isLoading = true thì hiển thị loading nên 
 
   useEffect(() => {
     if(chatBodyRef.current && textAreaRef.current){

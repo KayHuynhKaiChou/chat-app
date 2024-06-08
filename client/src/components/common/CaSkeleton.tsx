@@ -14,7 +14,7 @@ export default function CaSkeleton() {
           <Skeleton 
             animation="wave" 
             variant="rectangular" 
-            width={210} 
+            width={"80%"} 
             height={70}
           />
         </div>
