@@ -9,7 +9,6 @@ import {toast} from 'react-toastify'
 import { toastMSGObject } from "../../utils/availableMethod";
 
 export default function LoginPage() {
-
     const navigate = useNavigate();
 
     const handleSignIn = (values : Account) => {
@@ -36,7 +35,12 @@ export default function LoginPage() {
             </div>
             <div className="login-page__redirect">
                 <div className="login-page__redirect--title">don't have an account ?</div>
-                <div className="login-page__redirect--act">sign up</div>
+                <div 
+                    className="login-page__redirect--act"
+                    onClick={() => navigate('/sign-up')}
+                >
+                    sign up
+                </div>
             </div>
         </div>
     )
