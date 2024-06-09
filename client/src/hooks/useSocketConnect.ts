@@ -24,7 +24,7 @@ export default function useSocketConnect(){
 
     useEffect(() => {
         if (user) {
-            socket.current = io("http://localhost:1832");
+            socket.current = io(import.meta.env.VITE_SOCKET_IO_URL);
             socket.current.emit("add-user", user.id);
             socket.current.on("get-users-online" , (onlineUserIds) => {
                 console.log({onlineUserIds})
