@@ -74,18 +74,24 @@ export default function useContactAction() {
      */
     const updateCurrentContact = async (newMessage : MessageData) => {
         const listContactsClone = [...listContacts];
-        const foundCurrentContact = listContactsClone.find(contact => contact.receiver.id == newMessage.sender);
-        if(foundCurrentContact){
+        const foundSenderContact = listContactsClone.find(contact => contact.receiver.id == newMessage.sender);
+        if(foundSenderContact){ // ở màn hình chính của receiver
             newMessage = updateViewersMessage(newMessage)
-            foundCurrentContact.newMessage = newMessage
+            foundSenderContact.newMessage = newMessage
             if(newMessage.sender == currentContact?.receiver.id){
-                setCurrentContact(foundCurrentContact)
+                setCurrentContact(foundSenderContact)
                 if(newMessage.viewers.length == 2){
                     await messageServices.updateViewersMessage(newMessage)
                 }
             }
-            sortListContacts()
+        }else{ // ở màn hình chính của sender , don't need to update viewers
+            const foundCurrentContact = listContactsClone.find(contact => contact.receiver.id == currentContact?.receiver.id)
+            if(foundCurrentContact){
+                foundCurrentContact.newMessage = newMessage;
+                setCurrentContact(foundCurrentContact)
+            }
         }
+        sortListContacts()
     }
 
     // hook useEffect

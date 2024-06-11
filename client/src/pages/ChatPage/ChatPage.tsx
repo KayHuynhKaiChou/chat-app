@@ -25,7 +25,6 @@ export default function ChatPage() {
     isLoadingListContacts,
     setListContacts,
     setCurrentContact,
-    showListContacts,
     updateCurrentContact,
     updateContactsOnline
   } = useContact();
@@ -60,7 +59,6 @@ export default function ChatPage() {
         {(currentContact && socket) ? (
           <ChatContainerComponent
             receiver={currentContact.receiver}
-            showListContacts={showListContacts}
             handleSocketOn={handleSocketOn}
             handleSocketEmit={handleSocketEmit}
             handleSocketOff={handleSocketOff}

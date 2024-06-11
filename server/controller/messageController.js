@@ -60,12 +60,11 @@ class messageController {
             //     })
             //     .sort({ createdAt: -1 }) // Sort by creation time in descending order
             //     .exec();            
-            const update = await MessageModel.findByIdAndUpdate(
+            await MessageModel.findByIdAndUpdate(
                 newMessage._id,
                 newMessage,
                 {new : true}
             )
-            console.log({update})
             res.status(200).json(status200("Update viewers in conversation successfully!",null))           
         } catch (error) {
             status500(error)

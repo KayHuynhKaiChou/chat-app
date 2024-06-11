@@ -13,11 +13,10 @@ import CaLoading from "../common/CaLoading";
 
 interface chatContainerProps {
   receiver: User;
-  showListContacts: () => Promise<void>;
-  handleSocketOn: (listCallbackAsync: Array<(newMessage : MessageData) => void>) => void
+  handleSocketOn: (listCallbackAsync: Array<(newMessage : MessageData) => void>) => void;
   handleSocketEmit: (idReceiver : string , sentMessage : MessageData) => void;
   handleSocketOff: () => void;
-  updateCurrentContact: (newMessage : MessageData) => void
+  updateCurrentContact: (newMessage : MessageData) => void;
 }
 
 const DEFAULT_PERCENT_ROW_CHAT_HEADER = 10 as const
@@ -32,7 +31,6 @@ const MAX_WIDTH_CHAT_FOOTER = 230 as const
 export default function ChatContainerComponent(props: chatContainerProps) {
   const { 
     receiver,
-    showListContacts, 
     handleSocketOn,
     handleSocketEmit,
     handleSocketOff,
@@ -139,13 +137,17 @@ export default function ChatContainerComponent(props: chatContainerProps) {
 
   const handleSendMessageBefore = async () => {
     const sentMessage = await handleSendMessage();
-    await showListContacts();
+    //await showListContacts();
+    updateMessages(sentMessage);
+    updateCurrentContact(sentMessage);
     handleSocketEmit(msgSend.to , sentMessage);
   }
 
   const handleDeleteMessageBefore = async (idMessage : MessageData['_id']) => {
     const deletedMessage = await handleDeleteMessage(idMessage); 
-    await showListContacts();
+    //await showListContacts();
+    updateMessages(deletedMessage);
+    updateCurrentContact(deletedMessage);
     handleSocketEmit(msgSend.to , deletedMessage);
   }
 
@@ -173,11 +175,11 @@ export default function ChatContainerComponent(props: chatContainerProps) {
   // hook useEffect
   useLayoutEffect(() => {
     setIsLoading(true)
-  },[messages])
+  },[receiver])
 
   useEffect(() => {
       setTimeout(() => {
-          setIsLoading(false);
+        setIsLoading(false);
       }, 2000);
   },[isLoading])
   

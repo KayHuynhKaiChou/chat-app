@@ -62,20 +62,20 @@ export default function useMessageAction(
      * @param newMessage có thể là msg được gửi hoặc msg đã bị xóa từ sender
      */
     const updateMessages = (newMessage : MessageData) => {
-        if(newMessage.sender == currentContact.id){
-            // when delete message
-            if(newMessage.isDeleted){
-                const messagesClone = [...messages];
-                const deletedMessage = messagesClone.find(msg => msg._id == newMessage._id)
-                if(deletedMessage) {
-                    deletedMessage.isDeleted = true
-                }
-                setMessages(messagesClone)
-            // when send new message
-            }else{
-                setMessages([...messages , newMessage])
+        // Đây là case bên màn hình receiver B , ta có A => current contact B nhưng B => current contact C  
+        // ta ko cần thao tác gì với state messages vì messages state là giữa receiver 
+        // và ng khác , ko phải giữa receiver và sender
+        if(newMessage.sender != currentContact.id && newMessage.sender != user.id) return;
+        // Đây là case ở màn hình bên nào cx đc, mà màn hình A => current contact B và màn hình B => current contact A
+        if(newMessage.isDeleted){
+            const messagesClone = [...messages];
+            const deletedMessage = messagesClone.find(msg => msg._id == newMessage._id)
+            if(deletedMessage) {
+                deletedMessage.isDeleted = true
             }
+            setMessages(messagesClone)
         }
+        setMessages([...messages , newMessage])
     }
 
     // hook useEffect
