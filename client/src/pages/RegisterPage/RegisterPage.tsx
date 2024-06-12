@@ -36,7 +36,12 @@ export default function RegisterPage() {
             </div>
             <div className="register-page__redirect">
                 <div className="register-page__redirect--title">already have an account ?</div>
-                <div className="register-page__redirect--act">sign in</div>
+                <div 
+                    className="register-page__redirect--act"
+                    onClick={() => navigate('/sign-in')}
+                >
+                    sign in
+                </div>
             </div>
         </div>
     )
