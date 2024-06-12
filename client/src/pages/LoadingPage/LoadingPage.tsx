@@ -9,7 +9,7 @@ export default function LoadingPage() {
                 justifyContent: 'center',
                 alignItems: 'center',
                 minHeight: '100vh',
-                background: '#fff'
+                background: '#131324'
             }}
         >
             <CaLoading/>
