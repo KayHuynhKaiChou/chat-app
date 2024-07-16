@@ -74,8 +74,9 @@ export default function useMessageAction(
                 deletedMessage.isDeleted = true
             }
             setMessages(messagesClone)
+        }else{
+            setMessages([...messages , newMessage])
         }
-        setMessages([...messages , newMessage])
     }
 
     // hook useEffect
