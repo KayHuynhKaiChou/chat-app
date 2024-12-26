@@ -25,7 +25,15 @@ class messageController {
             const { from, to } = req.query;
 
             const messagesResult = await baseService.showConversationBetween(from , to);
-
+            const lastMessage = messagesResult[messagesResult.length - 1]
+            if (!lastMessage.viewers.includes(from)) {
+                lastMessage.viewers.push(from);
+                await MessageModel.findByIdAndUpdate(
+                    lastMessage._id,
+                    lastMessage,
+                    {new : true}
+                )
+            }
             res.status(200).json(status200(
                 `get data messages between ${from} and ${to} successfully`,
                 messagesResult

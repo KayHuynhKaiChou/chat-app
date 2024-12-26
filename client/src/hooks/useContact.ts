@@ -16,12 +16,12 @@ export default function useContactAction() {
             setIsLoadingListContacts(false);
         }
         let listContactsData : Contact[] = res.data;
-        listContactsData = listContactsData.map(con => {
+        listContactsData = listContactsData.map((con, index) => {
             return {
                 ...con,
                 receiver : {
                     ...con.receiver,
-                    isOnline : false
+                    isOnline : listContacts ? listContacts[index]?.receiver?.isOnline : false
                 }
             }
         })
@@ -50,7 +50,7 @@ export default function useContactAction() {
     }
 
     const updateViewersMessage = (newMessage : MessageData) => {
-        if(currentContact?.receiver.id == newMessage.sender){
+        if(currentContact?.receiver.id == newMessage.sender && !newMessage.viewers.includes(user.id)){
           newMessage.viewers.push(user.id)
         }
         return newMessage
@@ -95,16 +95,16 @@ export default function useContactAction() {
     }
 
     // hook useEffect
-    useEffect(() => {
-        // đi lấy last msg
-        if(currentContact && currentContact.newMessage){
-            updateCurrentContact(currentContact.newMessage);
-        }
-    },[currentContact])
+    // useEffect(() => {
+    //     // đi lấy last msg
+    //     if(currentContact && currentContact.newMessage){
+    //         updateCurrentContact(currentContact.newMessage);
+    //     }
+    // },[currentContact])
 
     useEffect(() => {
         showListContacts();
-    },[])
+    },[currentContact])
 
     return {
         //state

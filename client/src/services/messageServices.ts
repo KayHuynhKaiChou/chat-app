@@ -17,8 +17,8 @@ class messageServices {
         return res.data
     }
 
-    updateViewersMessage = async (idsViewers : MessageData) => {
-        await axios.put(`${API_URL}/message/update-viewers`, idsViewers)
+    updateViewersMessage = async (newMessage : MessageData) => {
+        await axios.put(`${API_URL}/message/update-viewers`, newMessage)
     }
 }
 
