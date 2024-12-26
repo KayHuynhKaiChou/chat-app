@@ -119,7 +119,6 @@ export default function ContactsComponent(props : contactsProps) {
     }
 
     const handleChangeSearchText = (e : any) => {
-        console.log(e.target.value === '')
         if(e.target.value === ''){
             handleSearchUsers(e.target.value);
         }else{

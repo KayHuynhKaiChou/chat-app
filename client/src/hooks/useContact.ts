@@ -16,12 +16,13 @@ export default function useContactAction() {
             setIsLoadingListContacts(false);
         }
         let listContactsData : Contact[] = res.data;
-        listContactsData = listContactsData.map((con, index) => {
+        listContactsData = listContactsData.map(con => {
+            const foundContact = listContacts.find(contact => contact.receiver.id == con.receiver.id);
             return {
                 ...con,
                 receiver : {
                     ...con.receiver,
-                    isOnline : listContacts ? listContacts[index]?.receiver?.isOnline : false
+                    isOnline : foundContact ? foundContact?.receiver?.isOnline : false
                 }
             }
         })
