@@ -1,6 +1,5 @@
 import { MessageModel } from "../model/MessageModel.js";
-import { status200, status400, status500 } from "../utils/statusResponse.js"
-import baseService from "./baseService.js";
+import { status200, status500 } from "../utils/statusResponse.js"
 
 class messageController {
 
@@ -23,16 +22,23 @@ class messageController {
     getMessages = async ( req, res) => {
         try {
             const { from, to } = req.query;
-
-            const messagesResult = await baseService.showConversationBetween(from , to);
-            const lastMessage = messagesResult[messagesResult.length - 1]
-            if (!lastMessage.viewers.includes(from)) {
-                lastMessage.viewers.push(from);
-                await MessageModel.findByIdAndUpdate(
-                    lastMessage._id,
-                    lastMessage,
-                    {new : true}
-                )
+            const messagesResult = await MessageModel
+            .find({
+                users : {
+                    $all : [from , to]
+                }
+            }).sort({ createdAt: 1 })
+            .select({ updatedAt: 0, deletedAt: 0 });
+            if(messagesResult.length > 0) {
+                const lastMessage = messagesResult[messagesResult.length - 1]
+                if (!lastMessage.viewers.includes(from)) {
+                    lastMessage.viewers.push(from);
+                    await MessageModel.findByIdAndUpdate(
+                        lastMessage._id,
+                        lastMessage,
+                        {new : true}
+                    )
+                }
             }
             res.status(200).json(status200(
                 `get data messages between ${from} and ${to} successfully`,

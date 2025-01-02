@@ -83,17 +83,16 @@ class userController {
             ]).lean();
 
             const modifiedListUsersPromise = listUsers.map(async (user) => {
-                const messagesResult = await baseService.showConversationBetween(idSender , user._id.toString())
+                const messagesResult = await baseService.getLastMessageInConversation(idSender , user._id.toString())
                 const receiver = {
                     id: user._id,
                     username: user.username,
                     email : user.email,
                     avatarImage : user.avatarImage 
                 };
-                const newMessage = [...messagesResult].pop() 
                 return {
                     receiver,
-                    newMessage
+                    newMessage : messagesResult
                 }
             });
             const modifiedListUsers = await Promise.all(modifiedListUsersPromise);

@@ -2,14 +2,16 @@ import { MessageModel } from "../model/MessageModel.js";
 
 class BaseService {
 
-    async showConversationBetween(idSender , idReceiver){
+    async showConversationBetween(senderId , receiverId){
         const messagesQuery = await MessageModel
             .find({
-                users: {
-                    $all: [idSender , idReceiver],
-                },
+                $or: [
+                    { 'users': [senderId, receiverId] },
+                    { 'users': [receiverId, senderId] }
+                ],
             }).sort({ createdAt: 1 })
             .select({ updatedAt: 0, deletedAt: 0 });
+            console.log(messagesQuery.length)
         return messagesQuery
     }
 
@@ -24,6 +26,16 @@ class BaseService {
         return [...listContactsHasMessage , ...listContactsNotMessage]
     }
 
+    
+    getLastMessageInConversation(senderId , receiverId){
+        const lastMessageQuery = MessageModel.findOne({
+            $or: [
+                { 'users': [senderId, receiverId] },
+                { 'users': [receiverId, senderId] }
+            ],
+        }).sort({ _id: -1 })
+        return lastMessageQuery
+    }
 }
 
 export default new BaseService

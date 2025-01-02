@@ -105,6 +105,25 @@ export default function useContactAction() {
 
     useEffect(() => {
         showListContacts();
+    },[])
+
+    useEffect(() => {
+        if(currentContact && 
+            currentContact.newMessage?.viewers &&
+            !currentContact.newMessage.viewers.includes(user.id)
+        ){
+            setCurrentContact({
+                ...currentContact , 
+                newMessage : {
+                    ...currentContact.newMessage , 
+                    viewers : [...currentContact.newMessage.viewers , user.id]
+                }
+            })
+            const foundContact = listContacts.find(con => con.receiver.id == currentContact.receiver.id)
+            if(foundContact){
+                foundContact.newMessage.viewers = [...foundContact.newMessage.viewers , user.id]
+            }
+        }
     },[currentContact])
 
     return {

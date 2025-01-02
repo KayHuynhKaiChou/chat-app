@@ -1,5 +1,29 @@
 const minuteToMilisecond = 60000;
 
+/**
+ * Formats the date between messages based on the time difference and context.
+ * 
+ * This function determines whether a timestamp should be displayed between
+ * consecutive messages in a chat interface, based on various conditions:
+ * 
+ * - If the time difference between the current and previous message is
+ *   less than 20 minutes, it returns null, indicating that no timestamp
+ *   should be shown.
+ * - If the messages are from different years, it returns a string in
+ *   the format: "Month Day, Year, HH:MM".
+ * - If the messages are from different months, weeks, or days of the week,
+ *   it returns a string in the format: "Month Day, HH:MM".
+ * - If the messages are from the same day, it returns a string in the
+ *   format: "HH:MM".
+ * - If the messages are from the same week, it returns a string in the
+ *   format: "Day, HH:MM".
+ * 
+ * @param previousMsgDate - The timestamp of the previous message, or null if
+ *                          there is no previous message.
+ * @param currentMsgDate - The timestamp of the current message.
+ * @returns A formatted date string or null if no timestamp should be shown.
+ */
+
 export function formatDateBetweenMsg(
   previousMsgDate: string | null,
   currentMsgDate: string
