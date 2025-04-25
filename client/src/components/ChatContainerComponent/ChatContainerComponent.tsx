@@ -228,7 +228,7 @@ export default function ChatContainerComponent(props: chatContainerProps) {
       // Clean up the event listener when the component unmounts
       handleSocketOff()
     };
-  }, [receiver , messages]);
+  }, [receiver , messages])
   // lý do có dependence messages là để useEffect này chạy lại sau khi send msg để đăng kí tham chiếu mới
   // cho updateCurrentContact, updateMessages hay nói cách khác 2 hàm update này sẽ nhận đc state mới 
 
